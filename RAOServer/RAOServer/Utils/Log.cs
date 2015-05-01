@@ -8,8 +8,10 @@ namespace RAOServer.Utils {
         }
 
         public static void Debug(string text) {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            _print(text);
+            if (Settings.IsDebug){
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                _print(text);
+            }
         }
 
         public static void Network(string text) {

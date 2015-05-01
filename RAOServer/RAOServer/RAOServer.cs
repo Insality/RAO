@@ -25,10 +25,11 @@ namespace RAOServer {
         }
 
         private void ServerHandleConnections(object obj) {
-            Log.Network("Starting Listen connections");
+            Log.Network("Starting Listen connections on " + Settings.Ip + ":" + Settings.Port);
+            Log.Debug("TEST");
 
             // For the information about this: https://github.com/sta/websocket-sharp           
-            var wssv = new WebSocketServer("ws://127.0.0.1:4080");
+            var wssv = new WebSocketServer(string.Format("ws://{0}:{1}", Settings.Ip, Settings.Port));
             wssv.AddWebSocketService<RAOServer>("/rao");
             wssv.Start();
             Log.Network("Waiting for connections");
