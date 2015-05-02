@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using RAOServer.Game;
 using RAOServer.Utils;
 using WebSocketSharp;
 using WebSocketSharp.Server;
@@ -10,6 +11,7 @@ namespace RAOServer {
         private WebSocketServer _webSocketServer;
         private Thread _serverConnections;
         private Thread _serverConsole;
+        private Thread _serverRoom;
 
         public void Start() {
             _webSocketServer = new WebSocketServer(string.Format("ws://{0}:{1}", Settings.Ip, Settings.Port));
@@ -20,11 +22,19 @@ namespace RAOServer {
 
             _serverConsole = new Thread(ServerHandleConsole);
             _serverConsole.Start();
+
+            _serverRoom = new Thread(ServerRoomHandler);
+            _serverRoom.Start();
         }
 
         private void ServerHandleConsole(object obj) {
             var serverConsole = new ServerConsole(_webSocketServer);
             serverConsole.Start();
+        }
+
+        private void ServerRoomHandler(object obj) {
+            var room = new RAORoom();
+            room.PrintMap();
         }
 
         private void ServerHandleConnections(object obj) {
