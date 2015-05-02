@@ -8,7 +8,7 @@ ws.onopen = function(){
 	ws.send("BALUSST");
 	ws.send("WRONG");
 	};
-ws.onclose = function(){ console.log("Connection close"); };
+ws.onclose = function(event){ console.log("Connection close. Reason: " + event.reason + ":" + event.code); };
 ws.onmessage = function(event){ console.log("Got data: " + event.data); };
 ws.onerror = function(error){ console.log("Got error: " + error.message); };
 

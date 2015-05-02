@@ -7,11 +7,14 @@ using WebSocketSharp.Server;
 
 namespace RAOServer {
     internal class RAOServer: WebSocketBehavior {
-//        private static NetServer _server;
-        private static Thread _serverConnections;
-        private static Thread _serverConsole;
+        private WebSocketServer _webSocketServer;
+        private Thread _serverConnections;
+        private Thread _serverConsole;
 
         public void Start() {
+            _webSocketServer = new WebSocketServer(string.Format("ws://{0}:{1}", Settings.Ip, Settings.Port));
+            _webSocketServer.AddWebSocketService<RAOServer>(Settings.GameRoute);
+
             _serverConnections = new Thread(ServerHandleConnections);
             _serverConnections.Start();
 
@@ -20,36 +23,34 @@ namespace RAOServer {
         }
 
         private void ServerHandleConsole(object obj) {
-            var serverConsole = new ServerConsole();
+            var serverConsole = new ServerConsole(_webSocketServer);
             serverConsole.Start();
         }
 
         private void ServerHandleConnections(object obj) {
             Log.Network("Starting Listen connections on " + Settings.Ip + ":" + Settings.Port);
-            Log.Debug("TEST");
 
             // For the information about this: https://github.com/sta/websocket-sharp           
-            var wssv = new WebSocketServer(string.Format("ws://{0}:{1}", Settings.Ip, Settings.Port));
-            wssv.AddWebSocketService<RAOServer>("/rao");
-            wssv.Start();
+            _webSocketServer.Start();
+
             Log.Network("Waiting for connections");
-//            wssv.Stop();
         }
 
         protected override void OnMessage(MessageEventArgs e) {
             var msg = e.Data == "BALUS"
                       ? "I've been balused already..."
                       : "I'm not available now.";
-            Log.Debug("Gor message from ???. Data: " + e.Data);
+            Log.Debug("Got message from ???. Data: " + e.Data);
             Send(msg);
         }
 
         protected override void OnOpen() {
-            Log.Network("Client connected");
-//            Log.Network(Context.Host);
-//            Log.Network(Context.Headers.ToString());
-//            Log.Network(Context.User.ToString());
-//            Log.Network(Context.UserEndPoint.ToString());
+            Log.Network("Client connected from " + Context.UserEndPoint );
         }
+
+        protected override void OnClose(CloseEventArgs e) {
+             Log.Network("Client dsconnected: " + Context.UserEndPoint + ". Reason: " + e.ToString());
+        }
+
     }
 }
