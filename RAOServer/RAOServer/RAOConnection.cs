@@ -1,4 +1,5 @@
-﻿using RAOServer.Utils;
+﻿using RAOServer.Game.Player;
+using RAOServer.Utils;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
@@ -6,23 +7,24 @@ namespace RAOServer {
     internal class RAOConnection: WebSocketBehavior {
         private readonly RAOServer _server;
         public string SessionId;
+        public Player Player;
 
         public RAOConnection() {
             _server = RAOServer.Instance;
         }
 
+        public void SendData(string data) {
+            Send(data);
+        }
+
         protected override void OnMessage(MessageEventArgs e) {
-            string msg = e.Data == "BALUS"
-                ? "I've been balused already..."
-                : "I'm not available now.";
-            Log.Debug("Got message from ???. Data: " + e.Data);
-            Send(msg);
+            _server.HandleMessage(e.Data, this);
         }
 
         protected override void OnOpen() {
             Log.Network("Client connected from " + Context.UserEndPoint);
             SessionId = ID;
-            _server.RegisterPlayer(SessionId);
+            Player = _server.RegisterPlayer(SessionId);
         }
 
         protected override void OnClose(CloseEventArgs e) {

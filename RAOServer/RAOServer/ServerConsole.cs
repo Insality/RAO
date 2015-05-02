@@ -11,7 +11,7 @@ namespace RAOServer {
         private readonly List<string> _commandsList = new List<string> {
             "help",
             "list",
-            "roomlist",
+            "listroom",
             "newroom",
             "removeroom",
             "exit"
@@ -38,13 +38,12 @@ namespace RAOServer {
             switch (command){
                 case "list":
                     Log.Terminal("Connections: " + _ws.WebSocketServices.SessionCount);
-                    Log.Terminal("IDs: " + String.Join(", ", _ws.WebSocketServices[Settings.GameRoute].Sessions.IDs));
 
                     foreach (var player in _server.GetPlayers()){
                         Log.Terminal("Player: " + player);
                     }
                     break;
-                case "roomlist":
+                case "listroom":
                     foreach (var room in _server.GetRooms()){
                         Log.Terminal("Room: " + room.Id);
                     }

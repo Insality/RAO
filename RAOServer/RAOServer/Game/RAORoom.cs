@@ -9,12 +9,13 @@ namespace RAOServer.Game {
     /// </summary>
     internal class RAORoom {
         private readonly Map _map = new Map();
+        private static int _roomCounter = 0;
         public int Id;
         private List<Player.Player> _players;
         private RAOServer _server;
 
         public RAORoom(RAOServer server) {
-            Id = server.GetRooms().Count;
+            Id = _roomCounter++;
             _players = new List<Player.Player>();
             _server = server;
             _map.LoadMapFromFile("testMap.txt");

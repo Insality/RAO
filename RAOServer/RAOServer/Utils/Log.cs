@@ -25,7 +25,7 @@ namespace RAOServer.Utils {
         }
 
         public static void Game(string text) {
-            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.ForegroundColor = ConsoleColor.Green;
             _print(text);
         }
 
