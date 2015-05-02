@@ -141,6 +141,7 @@ namespace RAOServer {
                     case MsgDict.ClientConnect:
                         break;
                     case MsgDict.ClientConnectRoom:
+                        HandleConnectRoom(connection, json, jsonData);
                         break;
                     case MsgDict.ClientStatus:
                         break;
@@ -148,9 +149,7 @@ namespace RAOServer {
                         break;
                     case MsgDict.ClientDisconnect:
                         RemovePlayer(connection.ID);
-                        _webSocketServer.WebSocketServices[Settings.GameRoute].Sessions.CloseSession(connection.ID,
-                            CloseStatusCode.Normal, "Disconnect by user"
-                            );
+                        connection.CloseConnection("Disconnect by user");
                         break;
                     case MsgDict.ClientControl:
                         break;
@@ -158,17 +157,26 @@ namespace RAOServer {
             }
             catch (Exception ex){
                 if (ex is JsonReaderException || ex is InvalidDataFormat){
-                    connection.SendData(ServerMessage.ResponseError(MsgDict.CodeIncorrectDataFormat));
+                    connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeIncorrectDataFormat));
                 }
                 else if (ex is InvalidDataValues){
-                    connection.SendData(ServerMessage.ResponseError(MsgDict.CodeIncorrectDataValues));
+                    connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeIncorrectDataValues));
                 }
                 else if (ex is InvalidApiVersion){
-                    connection.SendData(ServerMessage.ResponseError(MsgDict.CodeIncorrectApiVersion));
+                    connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeIncorrectApiVersion));
                 }
                 else{
                     Log.Error("Got exception in Handle message: " + ex);
                 }
+            }
+        }
+
+        private void HandleConnectRoom(RAOConnection connection, JToken json, JToken jsonData) {
+            var roomIndex = jsonData["index"];
+            var rm = _serverRooms.Find(room=>room.Id == int.Parse(roomIndex.ToString()));
+
+            if (rm != null){
+                connection.SendData(rm.GetStringMap());
             }
         }
     }

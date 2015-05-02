@@ -26,5 +26,14 @@ namespace RAOServer.Game {
                 Log.Debug(String.Join("", tile));
             }
         }
+
+        public string GetStringMap() {
+            var str = "";
+            foreach (var tileRow in _map.Tiles) {
+                str += string.Join("", tileRow);
+                str += '\n';
+            }
+            return str;
+        }
     }
 }

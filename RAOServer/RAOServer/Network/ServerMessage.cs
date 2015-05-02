@@ -8,7 +8,7 @@ namespace RAOServer.Network {
         [JsonProperty(PropertyName = "type")] public string Type;
 
 
-        public static string ResponseError(int errorCode) {
+        public static string ResponseCode(int errorCode) {
             var serverMessage = new ServerMessage {
                 Code = errorCode,
                 Data = "{}",

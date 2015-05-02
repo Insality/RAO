@@ -17,6 +17,10 @@ namespace RAOServer {
             Send(data);
         }
 
+        public void CloseConnection(string message) {
+           Sessions.CloseSession(ID, CloseStatusCode.Normal, message);
+        }
+
         protected override void OnMessage(MessageEventArgs e) {
             _server.HandleMessage(e.Data, this);
         }
