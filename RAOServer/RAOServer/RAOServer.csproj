@@ -62,10 +62,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Game\ITile.cs" />
     <Compile Include="Game\Map.cs" />
     <Compile Include="Game\RAORoom.cs" />
-    <Compile Include="Game\Tile.cs" />
+    <Compile Include="Game\Entities\Tile.cs" />
     <Compile Include="RAOServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Run.cs" />
