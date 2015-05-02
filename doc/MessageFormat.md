@@ -40,7 +40,7 @@
 ### Коды сообщений (msg_code):
 - 200 successful - успешно
 - 403 forbidden - запрещено
-- 1 api.no_method_version - не указана версия метода
-- 2 data.incorrect_format - неверный формат данных для типа сообщения: msg_type
-- 3 data.incorrect_data - неверные значения данных для типа сообщения: msg_type
+- 1 api.incorrect_version - не указана версия метода
+- 2 json.incorrect_format - неверный формат данных для типа сообщения: msg_type
+- 3 json.incorrect_data - неверные значения данных для типа сообщения: msg_type
 
