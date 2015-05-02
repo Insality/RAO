@@ -7,7 +7,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RAOServer.Game;
 using RAOServer.Game.Player;
+using RAOServer.Network;
 using RAOServer.Utils;
+using WebSocketSharp;
 using WebSocketSharp.Server;
 using Timer = System.Timers.Timer;
 
@@ -97,7 +99,7 @@ namespace RAOServer {
         public Player RegisterPlayer(string id) {
             var pl = new Player {Id = id};
             _allPlayers.Add(pl);
-           
+
             Log.Game(string.Format("Player {0} joined to the game", pl.Name));
             return pl;
         }
@@ -111,23 +113,62 @@ namespace RAOServer {
 
 
         /// <summary>
-        /// Обрабатывает все входящие сообщения и 
-        /// перенаправляет их в нужные места
+        ///     Обрабатывает все входящие сообщения и
+        ///     перенаправляет их в нужные места
         /// </summary>
         public void HandleMessage(string data, RAOConnection connection) {
             try{
-                var json = JToken.Parse(data);
-                Log.Debug(string.Format("Msg from {0}: {1}", connection.Player.Name, json["Test"]));
+                JToken json = JToken.Parse(data);
 
-                if (json["GetId"].ToString() == "My"){
-                    connection.SendData(connection.ID);
+                // Проверка на наличие необходимых ключей
+                if (MsgDict.ClientRequestKeys.Any(key=>json[key] == null)){
+                    throw new InvalidDataFormat();
+                }
+
+                // Проверка валидности значений
+                if (MsgDict.AviableApi.All(api=>api != json["api"].ToString())){
+                    throw new InvalidApiVersion();
+                }
+                if (MsgDict.ClientTypeValues.All(type=>type != json["type"].ToString())){
+                    throw new InvalidDataValues();
+                }
+
+                JToken jsonData = JToken.Parse(json["data"].ToString());
+
+                Log.Debug(string.Format("{2} Msg from {0}: {1}", connection.Player.Name, json["data"], json["type"]));
+
+                switch (json["type"].ToString()){
+                    case MsgDict.ClientConnect:
+                        break;
+                    case MsgDict.ClientConnectRoom:
+                        break;
+                    case MsgDict.ClientStatus:
+                        break;
+                    case MsgDict.ClientRequest:
+                        break;
+                    case MsgDict.ClientDisconnect:
+                        RemovePlayer(connection.ID);
+                        _webSocketServer.WebSocketServices[Settings.GameRoute].Sessions.CloseSession(connection.ID,
+                            CloseStatusCode.Normal, "Disconnect by user"
+                            );
+                        break;
+                    case MsgDict.ClientControl:
+                        break;
                 }
             }
-            catch (JsonReaderException jex){
-                connection.SendData("{'error': 'Wrong json format'}");
-            }
             catch (Exception ex){
-                Log.Error("Got exception in Handle message: " + ex.ToString());
+                if (ex is JsonReaderException || ex is InvalidDataFormat){
+                    connection.SendData(ServerMessage.ResponseError(MsgDict.CodeIncorrectDataFormat));
+                }
+                else if (ex is InvalidDataValues){
+                    connection.SendData(ServerMessage.ResponseError(MsgDict.CodeIncorrectDataValues));
+                }
+                else if (ex is InvalidApiVersion){
+                    connection.SendData(ServerMessage.ResponseError(MsgDict.CodeIncorrectApiVersion));
+                }
+                else{
+                    Log.Error("Got exception in Handle message: " + ex);
+                }
             }
         }
     }

@@ -26,12 +26,5 @@ namespace RAOServer {
             SessionId = ID;
             Player = _server.RegisterPlayer(SessionId);
         }
-
-        protected override void OnClose(CloseEventArgs e) {
-            // TODO: не отрабатывает
-            Log.Network("Client dsconnected: " + Context.UserEndPoint + ". Reason: " + e);
-            Send("CLOSE");
-            _server.RemovePlayer(SessionId);
-        }
     }
 }
