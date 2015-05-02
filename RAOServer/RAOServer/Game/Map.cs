@@ -4,10 +4,10 @@ using RAOServer.Utils;
 
 namespace RAOServer.Game {
     internal class Map {
-        public List<List<Tile>> tiles;
+        public List<List<Tile>> Tiles;
 
         public void LoadMapFromFile(string filename) {
-            tiles = new List<List<Tile>>();
+            Tiles = new List<List<Tile>>();
 
             string s = File.ReadAllText(filename);
             var tileMap = new List<string>(s.Split('\n'));
@@ -34,7 +34,7 @@ namespace RAOServer.Game {
                     }
                     tilesRow.Add(tile);
                 }
-                tiles.Add(tilesRow);
+                Tiles.Add(tilesRow);
             }
         }
     }

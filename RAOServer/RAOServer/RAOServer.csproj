@@ -63,6 +63,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Game\Map.cs" />
+    <Compile Include="Game\Mechanics\Stat.cs" />
+    <Compile Include="Game\Player\Hero.cs" />
+    <Compile Include="Game\Player\Player.cs" />
+    <Compile Include="Game\Player\PlayerStatistic.cs" />
     <Compile Include="Game\RAORoom.cs" />
     <Compile Include="Game\Entities\Tile.cs" />
     <Compile Include="RAOServer.cs" />
@@ -102,6 +106,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

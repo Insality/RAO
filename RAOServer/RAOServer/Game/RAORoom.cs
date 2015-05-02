@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using RAOServer.Utils;
 
 namespace RAOServer.Game {
@@ -7,14 +8,20 @@ namespace RAOServer.Game {
     ///     и обрабатывает все действия в этой комнате
     /// </summary>
     internal class RAORoom {
-        private readonly Map map = new Map();
+        private readonly Map _map = new Map();
+        public int Id;
+        private List<Player.Player> _players;
+        private RAOServer _server;
 
-        public RAORoom() {
-            map.LoadMapFromFile("testMap.txt");
+        public RAORoom(RAOServer server) {
+            Id = server.GetRooms().Count;
+            _players = new List<Player.Player>();
+            _server = server;
+            _map.LoadMapFromFile("testMap.txt");
         }
 
         public void PrintMap() {
-            foreach (var tile in map.tiles){
+            foreach (var tile in _map.Tiles){
                 Log.Debug(String.Join("", tile));
             }
         }

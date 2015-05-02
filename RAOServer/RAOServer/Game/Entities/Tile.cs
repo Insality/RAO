@@ -3,15 +3,15 @@
         public bool IsSolid;
         public char Symbol;
 
-        public Tile(char Symbol) {
+        public Tile(char symbol) {
             // TODO: Загрушка, исправить на загрузку из словаря
-            if (Symbol == '#'){
+            if (symbol == '#'){
                 IsSolid = true;
             }
             else{
                 IsSolid = false;
             }
-            this.Symbol = Symbol;
+            Symbol = symbol;
         }
 
         public void Update() {

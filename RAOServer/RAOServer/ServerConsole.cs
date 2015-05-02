@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RAOServer.Game;
 using RAOServer.Utils;
 using WebSocketSharp;
 using WebSocketSharp.Server;
@@ -10,13 +11,18 @@ namespace RAOServer {
         private readonly List<string> _commandsList = new List<string> {
             "help",
             "list",
+            "roomlist",
+            "newroom",
+            "removeroom",
             "exit"
         };
 
+        private RAOServer server;
         private WebSocketServer ws;
 
-        public ServerConsole(WebSocketServer ws) {
-            this.ws = ws;
+        public ServerConsole(RAOServer server) {
+            this.server = server;
+            ws = server.GetSocketServer();
         }
 
         public void Start() {
@@ -33,6 +39,23 @@ namespace RAOServer {
                 case "list":
                     Log.Terminal("Connections: " + ws.WebSocketServices.SessionCount);
                     Log.Terminal("IDs: " + String.Join(", ", ws.WebSocketServices[Settings.GameRoute].Sessions.IDs));
+
+                    foreach (var player in server.GetPlayers()){
+                        Log.Terminal("Player: " + player);
+                    }
+                    break;
+                case "roomlist":
+                    foreach (var room in server.GetRooms()){
+                        Log.Terminal("Room: " + room.Id);
+                    }
+                    break;
+                case "newroom":
+                    var newRoom = new RAORoom(server);
+                    Log.Network("New room: " + newRoom.Id);
+                    server.GetRooms().Add(newRoom);
+                    break;
+                case "removeroom":
+                    server.GetRooms().Remove(server.GetRooms().Find(room=>room.Id == int.Parse(arg)));
                     break;
                 case "help":
                     Log.Terminal(String.Join("\n", _commandsList));
