@@ -25,7 +25,7 @@ namespace RAOServer.Utils {
         }
 
         public static void Game(string text) {
-            Console.ForegroundColor = ConsoleColor.DarkBlue;
+            Console.ForegroundColor = ConsoleColor.Blue;
             _print(text);
         }
 
@@ -37,6 +37,7 @@ namespace RAOServer.Utils {
         private static void _print(string text) {
             string curTime = DateTime.Now.ToString("[HH:mm:ss]: ");
             Console.WriteLine(curTime + text);
+            Console.ForegroundColor = ConsoleColor.White;
 
             if (Settings.IsLogToFile)
                 _printToLogFile(text);

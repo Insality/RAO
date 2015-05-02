@@ -17,12 +17,12 @@ namespace RAOServer {
             "exit"
         };
 
-        private RAOServer server;
-        private WebSocketServer ws;
+        private readonly RAOServer _server;
+        private readonly WebSocketServer _ws;
 
         public ServerConsole(RAOServer server) {
-            this.server = server;
-            ws = server.GetSocketServer();
+            _server = server;
+            _ws = server.GetSocketServer();
         }
 
         public void Start() {
@@ -37,31 +37,34 @@ namespace RAOServer {
             command = command.Split(' ').First();
             switch (command){
                 case "list":
-                    Log.Terminal("Connections: " + ws.WebSocketServices.SessionCount);
-                    Log.Terminal("IDs: " + String.Join(", ", ws.WebSocketServices[Settings.GameRoute].Sessions.IDs));
+                    Log.Terminal("Connections: " + _ws.WebSocketServices.SessionCount);
+                    Log.Terminal("IDs: " + String.Join(", ", _ws.WebSocketServices[Settings.GameRoute].Sessions.IDs));
 
-                    foreach (var player in server.GetPlayers()){
+                    foreach (var player in _server.GetPlayers()){
                         Log.Terminal("Player: " + player);
                     }
                     break;
                 case "roomlist":
-                    foreach (var room in server.GetRooms()){
+                    foreach (var room in _server.GetRooms()){
                         Log.Terminal("Room: " + room.Id);
                     }
                     break;
                 case "newroom":
-                    var newRoom = new RAORoom(server);
+                    var newRoom = new RAORoom(_server);
                     Log.Network("New room: " + newRoom.Id);
-                    server.GetRooms().Add(newRoom);
+                    _server.GetRooms().Add(newRoom);
                     break;
                 case "removeroom":
-                    server.GetRooms().Remove(server.GetRooms().Find(room=>room.Id == int.Parse(arg)));
+                    _server.GetRooms().Remove(_server.GetRooms().Find(room=>room.Id == int.Parse(arg)));
                     break;
                 case "help":
                     Log.Terminal(String.Join("\n", _commandsList));
                     break;
+                case "check":
+                    _server.CheckPlayersOnline();
+                    break;
                 case "exit":
-                    ws.Stop(CloseStatusCode.Normal, "Shutdown");
+                    _ws.Stop(CloseStatusCode.Normal, "Shutdown");
                     Environment.Exit(0);
                     break;
                 default:

@@ -69,6 +69,7 @@
     <Compile Include="Game\Player\PlayerStatistic.cs" />
     <Compile Include="Game\RAORoom.cs" />
     <Compile Include="Game\Entities\Tile.cs" />
+    <Compile Include="RAOConnection.cs" />
     <Compile Include="RAOServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Run.cs" />

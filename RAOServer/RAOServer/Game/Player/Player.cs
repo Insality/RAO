@@ -1,6 +1,6 @@
 ﻿namespace RAOServer.Game.Player {
     internal class Player {
-        public int Id;
+        public string Id;
         public string Name = "unnamed";
         public Hero Hero;
         public int Level;
