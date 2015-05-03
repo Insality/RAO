@@ -30,6 +30,12 @@
 ### От клиента:
 Возможные msg_type:
 - *connect* - подключение к серверу
+```javascript
+data: {
+    "login": "ваш логин",
+    "password": "ваш пароль"  // временно без хеша
+}
+```
 - *connect_room* - подключение к игровой комнате
 - *disconnect* - отключение от сервера
 - *control* - команды для управления героем во время игры
@@ -43,4 +49,6 @@
 - 1 api.incorrect_version - не указана версия метода
 - 2 json.incorrect_format - неверный формат данных для типа сообщения: msg_type
 - 3 json.incorrect_data - неверные значения данных для типа сообщения: msg_type
+- 4 auth.incorrect_login_or_password - неверные логин или пароль
+- 5 auth.already_logged - попытка повторной авторизации
 
