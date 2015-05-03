@@ -5,6 +5,28 @@
 		$("#logger").text(new_text);
 	}
 
+	// REQUESTS BUILDER
+	// ================
+	function getRequestForm(){
+		return {"type": "", "api": "1.0", "data": {}}
+	}
+
+	function getDisconnect(){
+		a = getRequestForm();
+		a["type"] = "disconnect";
+		return a
+	}
+
+	function getConnect(){
+		a = getRequestForm();
+		a["type"] = "connect";
+		data = {"login": $("#login").val(), "password": $("#password").val()};
+		a["data"] = data;
+		return a;
+	}
+
+
+
 
 	// CONNECTIONS SETTINGS
 	// ====================
@@ -14,14 +36,20 @@
 		log("Connection opened to "+ URL);
 		};
 	ws.onclose = function(event){ log("Connection close. Reason: " + event.reason + ":" + event.code); };
-	ws.onmessage = function(event){ log("Got data: " + event.data); };
+	ws.onmessage = function(event){ log("Response: " + event.data); };
 	ws.onerror = function(error){ log("Got error: " + error.message); };
+
+	function send(json){
+		text = JSON.stringify(json)
+		log("Send: " + text)
+		ws.send(text);
+	}
 
 	// BUTTONS FUNCTIONS
 	// =================
-	document.getElementById('connect').addEventListener('click', function(){ log("connect") }, false);
+	document.getElementById('connect').addEventListener('click', function(){ send(getConnect()) }, false);
 	document.getElementById('connect_room').addEventListener('click', function(){ log("connect room") }, false);
-	document.getElementById('disconnect').addEventListener('click', function(){ log("disconnect") }, false);
+	document.getElementById('disconnect').addEventListener('click', function(){ send(getDisconnect()); }, false);
 	document.getElementById('status').addEventListener('click', function(){ log("status") }, false);
 })();
 

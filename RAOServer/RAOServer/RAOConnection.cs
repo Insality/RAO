@@ -28,7 +28,6 @@ namespace RAOServer {
         protected override void OnOpen() {
             Log.Network("Client connected from " + Context.UserEndPoint);
             SessionId = ID;
-            Player = _server.RegisterPlayer(SessionId);
         }
     }
 }

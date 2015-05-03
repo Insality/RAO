@@ -9,4 +9,10 @@ namespace RAOServer.Network {
 
     public class InvalidApiVersion : Exception {
     }
+
+    public class InvalidLoginOrPassword: Exception {
+    }
+
+    public class AlreadyLogged: Exception {
+    }
 }
