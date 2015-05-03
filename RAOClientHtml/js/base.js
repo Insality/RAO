@@ -25,6 +25,13 @@
 		return a;
 	}
 
+	function getRequest(request_list){
+		a = getRequestForm();
+		a["type"] = "request";
+		a["data"] = {"requests": request_list}
+		return a;
+	}
+
 
 
 
@@ -50,6 +57,7 @@
 	document.getElementById('connect').addEventListener('click', function(){ send(getConnect()) }, false);
 	document.getElementById('connect_room').addEventListener('click', function(){ log("connect room") }, false);
 	document.getElementById('disconnect').addEventListener('click', function(){ send(getDisconnect()); }, false);
+	document.getElementById('request').addEventListener('click', function(){ send(getRequest(["roomlist"])); }, false);
 	document.getElementById('status').addEventListener('click', function(){ log("status") }, false);
 })();
 

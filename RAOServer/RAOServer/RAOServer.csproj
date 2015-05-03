@@ -82,6 +82,7 @@
     <Compile Include="Run.cs" />
     <Compile Include="ServerConsole.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Utils\Auth.cs" />
     <Compile Include="Utils\Log.cs" />
   </ItemGroup>
   <ItemGroup>

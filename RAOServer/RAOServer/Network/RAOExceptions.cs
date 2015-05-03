@@ -15,4 +15,5 @@ namespace RAOServer.Network {
 
     public class AlreadyLogged: Exception {
     }
+
 }

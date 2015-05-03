@@ -16,7 +16,11 @@ namespace RAOServer.Network {
                 Type = MsgDict.ServerResponse
             };
 
-            return JsonConvert.SerializeObject(serverMessage);
+            return serverMessage.Serialize();
+        }
+
+        public string Serialize() {
+            return JsonConvert.SerializeObject(this, Formatting.None);
         }
     }
 }

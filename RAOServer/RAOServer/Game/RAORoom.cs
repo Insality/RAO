@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using RAOServer.Utils;
 
 namespace RAOServer.Game {
@@ -11,7 +12,8 @@ namespace RAOServer.Game {
         private readonly Map _map = new Map();
         private static int _roomCounter = 0;
         public int Id;
-        private List<Player.Player> _players;
+        public int MaxPlayers = 4;
+        private readonly List<Player.Player> _players;
         private RAOServer _server;
 
         public RAORoom(RAOServer server) {
@@ -27,6 +29,10 @@ namespace RAOServer.Game {
             }
         }
 
+        public int GetPlayersCount() {
+            return _players.Count;
+        }
+
         public string GetStringMap() {
             var str = "";
             foreach (var tileRow in _map.Tiles) {
@@ -34,6 +40,14 @@ namespace RAOServer.Game {
                 str += '\n';
             }
             return str;
+        }
+
+        public JObject GetInfo() {
+            var rm = new JObject();
+            rm.Add("Id", Id);
+            rm.Add("Players", GetPlayersCount());
+            rm.Add("MaxPlayers", MaxPlayers);
+            return rm;
         }
     }
 }

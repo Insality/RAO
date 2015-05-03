@@ -47,6 +47,8 @@ namespace RAOServer {
 
             _serverConsole = new Thread(ServerConsoleHandler);
             _serverConsole.Start();
+
+            CreateNewRoom();
         }
 
         public int CreateNewRoom() {
@@ -150,6 +152,7 @@ namespace RAOServer {
                     case MsgDict.ClientStatus:
                         break;
                     case MsgDict.ClientRequest:
+                        HandleRequest(connection, json, jsonData);
                         break;
                     case MsgDict.ClientDisconnect:
                         if (connection.Player != null)
@@ -211,6 +214,31 @@ namespace RAOServer {
             if (rm != null){
                 connection.SendData(rm.GetStringMap());
             }
+        }
+
+        private void HandleRequest(RAOConnection connection, JToken json, JToken jsonData) {
+            if (jsonData["requests"] == null){
+                throw new InvalidDataFormat();
+            }
+
+            var sm = new ServerMessage();
+            sm.Code = 200;
+            sm.Type = MsgDict.ServerInformation;
+            sm.Error = MsgDict.MsgCode[sm.Code];
+
+            var data = new JObject();
+            JToken requests = jsonData["requests"];
+
+            if (requests.ToList().Contains("roomlist")){
+                var roomlist = new List<JObject>();
+                foreach (RAORoom room in GetRooms()){
+                    roomlist.Add(room.GetInfo());
+                }
+                data.Add("roomlist", JToken.FromObject(roomlist));
+            }
+
+            sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
+            connection.SendData(sm.Serialize());
         }
     }
 }
