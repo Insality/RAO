@@ -22,6 +22,10 @@ namespace RAOServer.Network {
         public const int CodeIncorrectDataValues = 3;
         public const int CodeIncorrectLoginOrPassword = 4;
         public const int CodeAlreadyLogged = 5;
+        public const int CodeNotLoggedIn = 6;
+        public const int CodePlayerNotInGame = 10;
+        public const int CodePlayerNotInLobby = 11;
+        public const int CodeRoomMaxPlayers = 20;
 
 
         public static readonly List<string> ClientRequestKeys = new List<string> {"type", "api", "data"};
@@ -47,7 +51,11 @@ namespace RAOServer.Network {
             {CodeIncorrectDataFormat, "json.incorrect_format"},
             {CodeIncorrectDataValues, "json.incorrect_data"},
             {CodeIncorrectLoginOrPassword, "auth.incorrect_login_or_password"},
-            {CodeAlreadyLogged, "auth.already_logged"}
+            {CodeNotLoggedIn, "auth.not_logged_in"},
+            {CodeAlreadyLogged, "auth.already_logged"},
+            {CodePlayerNotInGame, "player.not_in_game"},
+            {CodePlayerNotInLobby, "player.not_in_lobby"},
+            {CodeRoomMaxPlayers, "game.room.max_players"}
         };
     }
 }

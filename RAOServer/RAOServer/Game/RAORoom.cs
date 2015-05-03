@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using RAOServer.Network;
 using RAOServer.Utils;
 
 namespace RAOServer.Game {
@@ -48,6 +49,17 @@ namespace RAOServer.Game {
             rm.Add("Players", GetPlayersCount());
             rm.Add("MaxPlayers", MaxPlayers);
             return rm;
+        }
+
+        internal void ConnectPlayer(RAOConnection connection) {
+            if (_players.Count >= MaxPlayers){
+                throw new GameRoomMaxPlayers();
+            }
+
+            _players.Add(connection.Player);
+            connection.Player.CurrentRoom = Id;
+            // DEBUG, TEST
+            connection.SendData(GetStringMap());
         }
     }
 }

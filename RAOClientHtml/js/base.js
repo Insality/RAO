@@ -25,6 +25,14 @@
 		return a;
 	}
 
+	function getConnectRoom(){
+		a = getRequestForm();
+		a["type"] = "connect_room";
+		data = {"index": $("#index").val()};
+		a["data"] = data;
+		return a;
+	}
+
 	function getRequest(request_list){
 		a = getRequestForm();
 		a["type"] = "request";
@@ -55,7 +63,7 @@
 	// BUTTONS FUNCTIONS
 	// =================
 	document.getElementById('connect').addEventListener('click', function(){ send(getConnect()) }, false);
-	document.getElementById('connect_room').addEventListener('click', function(){ log("connect room") }, false);
+	document.getElementById('connect_room').addEventListener('click', function(){ send(getConnectRoom()) }, false);
 	document.getElementById('disconnect').addEventListener('click', function(){ send(getDisconnect()); }, false);
 	document.getElementById('request').addEventListener('click', function(){ send(getRequest(["roomlist"])); }, false);
 	document.getElementById('status').addEventListener('click', function(){ log("status") }, false);

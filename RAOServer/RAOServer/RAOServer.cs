@@ -98,7 +98,7 @@ namespace RAOServer {
         }
 
         public Player RegisterPlayer(string id, string login) {
-            var pl = new Player {Id = id, Name = login};
+            var pl = new Player(id, login);
             _allPlayers.Add(pl);
 
             Log.Game(string.Format("Player {0} joined to the game", pl.Name));
@@ -125,6 +125,11 @@ namespace RAOServer {
                 // Проверка на наличие необходимых ключей
                 if (MsgDict.ClientRequestKeys.Any(key=>json[key] == null)){
                     throw new InvalidDataFormat();
+                }
+
+                // Без логина можно посылать только запрос на подключение
+                if (connection.Player == null && json["type"].ToString() != MsgDict.ClientConnect){
+                    throw new NotLoggedIn();
                 }
 
                 // Проверка валидности значений
@@ -164,20 +169,11 @@ namespace RAOServer {
                 }
             }
             catch (Exception ex){
-                if (ex is JsonReaderException || ex is InvalidDataFormat){
+                if (ex is JsonReaderException){
                     connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeIncorrectDataFormat));
                 }
-                else if (ex is InvalidDataValues){
-                    connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeIncorrectDataValues));
-                }
-                else if (ex is InvalidApiVersion){
-                    connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeIncorrectApiVersion));
-                }
-                else if (ex is InvalidLoginOrPassword){
-                    connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeIncorrectLoginOrPassword));
-                }
-                else if (ex is AlreadyLogged){
-                    connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeAlreadyLogged));
+                else if (ex is RAOException){
+                    connection.SendData(ServerMessage.ResponseCode((ex as RAOException).Code));
                 }
                 else{
                     Log.Error("Got exception in Handle message: " + ex);
@@ -197,7 +193,7 @@ namespace RAOServer {
             string login = jsonData["login"].ToString();
             string password = jsonData["password"].ToString();
 
-            if (login == "Insality" && password == "Insality"){
+            if (login == "" && password == ""){
                 Player player = RegisterPlayer(connection.ID, login);
                 connection.Player = player;
                 connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeSuccessful));
@@ -208,11 +204,21 @@ namespace RAOServer {
         }
 
         private void HandleConnectRoom(RAOConnection connection, JToken json, JToken jsonData) {
+            if (jsonData["index"] == null){
+                throw new InvalidDataFormat();
+            }
+            if (connection.Player.CurrentRoom != -1){
+                throw new PlayerNotInLobby();
+            }
+
             JToken roomIndex = jsonData["index"];
             RAORoom rm = _serverRooms.Find(room=>room.Id == int.Parse(roomIndex.ToString()));
 
             if (rm != null){
-                connection.SendData(rm.GetStringMap());
+                rm.ConnectPlayer(connection);
+            }
+            else{
+                throw new InvalidDataValues();
             }
         }
 
