@@ -3,8 +3,28 @@
 <head>
 	<meta charset="UTF-8">
 	<title>RAO</title>
+	<link rel="stylesheet" href="css/main.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 </head>
 <body>
-	<script src="connect.js"></script>
+	<div id="wrapper">
+		<canvas id="myCanvas" width="600", height="400"></canvas>
+		<div id="buttonWrapper">
+			<input type="button" id="connect" value="Connect">
+			<input type="button" id="connect_room" value="Connect room">
+			<input type="button" id="disconnect" value="Disconnect">
+			<input type="button" id="status" value="Status">
+			</br>
+			Login:
+			<input type="text" id="login" placeholder="input your name">
+			</br>
+			Password:
+			<input type="text" id="password" placeholder="input your pass">
+		</div>
+		<div id="logger">
+		</div>
+	</div>
+
+	<script src="js/base.js"></script>
 </body>
 </html>

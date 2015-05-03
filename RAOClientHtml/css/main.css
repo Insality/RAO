@@ -1,0 +1,19 @@
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #dfdfdf
+}
+
+#wrapper {
+	position: relative;
+	border: 1px solid #9c9898;
+	width: 600px;
+	height: 400px;
+
+	background-color: #fff
+}
+
+#logger{
+	margin-top: 64px;
+	white-space: pre-wrap;
+}
