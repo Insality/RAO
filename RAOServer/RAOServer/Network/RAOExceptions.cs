@@ -31,7 +31,7 @@ namespace RAOServer.Network {
 
     public class NotLoggedIn: RAOException {
         public NotLoggedIn() {
-            Code = MsgDict.AuthNotLoggedIn;
+            Code = MsgDict.CodeNotLoggedIn;
         }
     }
 
@@ -43,19 +43,19 @@ namespace RAOServer.Network {
 
     public class PlayerNotInGame: RAOException {
         public PlayerNotInGame() {
-            Code = MsgDict.PlayerNotInGame;
+            Code = MsgDict.CodePlayerNotInGame;
         }
     }
 
     public class PlayerNotInLobby: RAOException {
         public PlayerNotInLobby() {
-            Code = MsgDict.PlayerNotInLobby;
+            Code = MsgDict.CodePlayerNotInLobby;
         }
     }
 
     public class GameRoomMaxPlayers: RAOException {
         public GameRoomMaxPlayers() {
-            Code = MsgDict.GameRoomMaxPlayers;
+            Code = MsgDict.CodeRoomMaxPlayers;
         }
     }
 }
