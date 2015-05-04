@@ -10,15 +10,17 @@ namespace RAOServer.Game {
     ///     и обрабатывает все действия в этой комнате
     /// </summary>
     internal class RAORoom {
+        private static int _roomCounter;
         private readonly Map _map = new Map();
-        private static int _roomCounter = 0;
+        private readonly List<Player.Player> _players;
         public int Id;
         public int MaxPlayers = 4;
-        private readonly List<Player.Player> _players;
+        public string State;
         private RAOServer _server;
 
         public RAORoom(RAOServer server) {
             Id = _roomCounter++;
+            State = States.RoomWaiting;
             _players = new List<Player.Player>();
             _server = server;
             _map.LoadMapFromFile("testMap.txt");
@@ -35,8 +37,8 @@ namespace RAOServer.Game {
         }
 
         public string GetStringMap() {
-            var str = "";
-            foreach (var tileRow in _map.Tiles) {
+            string str = "";
+            foreach (var tileRow in _map.Tiles){
                 str += string.Join("", tileRow);
                 str += '\n';
             }
@@ -44,11 +46,13 @@ namespace RAOServer.Game {
         }
 
         public JObject GetInfo() {
-            var rm = new JObject();
-            rm.Add("Id", Id);
-            rm.Add("Players", GetPlayersCount());
-            rm.Add("MaxPlayers", MaxPlayers);
-            return rm;
+            var info = new JObject {
+                {"Id", Id},
+                {"Players", GetPlayersCount()},
+                {"MaxPlayers", MaxPlayers},
+                {"State", State}
+            };
+            return info;
         }
 
         internal void ConnectPlayer(RAOConnection connection) {
@@ -57,9 +61,7 @@ namespace RAOServer.Game {
             }
 
             _players.Add(connection.Player);
-            connection.Player.CurrentRoom = Id;
-            // DEBUG, TEST
-            connection.SendData(GetStringMap());
+            connection.Player.ConnectToRoom(Id);
         }
     }
 }

@@ -73,6 +73,7 @@
     <Compile Include="Game\Player\PlayerStatistic.cs" />
     <Compile Include="Game\RAORoom.cs" />
     <Compile Include="Game\Entities\Tile.cs" />
+    <Compile Include="Game\States.cs" />
     <Compile Include="Network\MsgDict.cs" />
     <Compile Include="Network\RAOExceptions.cs" />
     <Compile Include="Network\ServerMessage.cs" />

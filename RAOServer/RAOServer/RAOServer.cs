@@ -155,6 +155,7 @@ namespace RAOServer {
                         HandleConnectRoom(connection, json, jsonData);
                         break;
                     case MsgDict.ClientStatus:
+                        HandleStatus(connection, json, jsonData);
                         break;
                     case MsgDict.ClientRequest:
                         HandleRequest(connection, json, jsonData);
@@ -194,7 +195,7 @@ namespace RAOServer {
             string password = jsonData["password"].ToString();
 
             if (login == "" && password == ""){
-                Player player = RegisterPlayer(connection.ID, login);
+                Player player = RegisterPlayer(connection.ID, "InsalityTEST");
                 connection.Player = player;
                 connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeSuccessful));
             }
@@ -212,10 +213,17 @@ namespace RAOServer {
             }
 
             JToken roomIndex = jsonData["index"];
-            RAORoom rm = _serverRooms.Find(room=>room.Id == int.Parse(roomIndex.ToString()));
+            RAORoom rm;
+            try{
+                rm = _serverRooms.Find(room=>room.Id == int.Parse(roomIndex.ToString()));
+            }
+            catch (FormatException ex){
+                throw new InvalidDataValues();
+            }
 
             if (rm != null){
                 rm.ConnectPlayer(connection);
+                connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeSuccessful));
             }
             else{
                 throw new InvalidDataValues();
@@ -227,10 +235,7 @@ namespace RAOServer {
                 throw new InvalidDataFormat();
             }
 
-            var sm = new ServerMessage();
-            sm.Code = 200;
-            sm.Type = MsgDict.ServerInformation;
-            sm.Error = MsgDict.MsgCode[sm.Code];
+            var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerInformation};
 
             var data = new JObject();
             JToken requests = jsonData["requests"];
@@ -242,6 +247,16 @@ namespace RAOServer {
                 }
                 data.Add("roomlist", JToken.FromObject(roomlist));
             }
+
+            sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
+            connection.SendData(sm.Serialize());
+        }
+
+        private void HandleStatus(RAOConnection connection, JToken json, JToken jsonData) {
+            var sm = new ServerMessage { Code = 200, Type = MsgDict.ServerStatus };
+
+            var data = new JObject();
+            data.Add("player", connection.Player.GetInfo());
 
             sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
             connection.SendData(sm.Serialize());
