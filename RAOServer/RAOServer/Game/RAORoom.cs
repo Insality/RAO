@@ -62,11 +62,15 @@ namespace RAOServer.Game {
 
             _players.Add(player);
             player.ConnectToRoom(Id);
+
+            Log.Game(string.Format("Player {0} joined to room {1}", player.Name, Id));
         }
 
         internal void DisconnectPlayer(Player.Player player) {
             _players.Remove(player);
             player.ConnectToLobby();
+
+            Log.Game(string.Format("Player {0} leave room {1}", player.Name, Id));
         }
     }
 }
