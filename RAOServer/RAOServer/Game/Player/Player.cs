@@ -36,5 +36,14 @@ namespace RAOServer.Game.Player {
             CurrentRoom = id;
             State = States.PlayerGame;
         }
+
+        public void ConnectToLobby() {
+            if (State != States.PlayerGame) {
+                throw new PlayerNotInGame();
+            }
+
+            CurrentRoom = -1;
+            State = States.PlayerLobby;
+        }
     }
 }

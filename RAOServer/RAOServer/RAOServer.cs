@@ -118,6 +118,7 @@ namespace RAOServer {
         public void RemovePlayer(string id) {
             var pl = _allPlayers.Find(player=>player.Id == id);
             _allPlayers.Remove(pl);
+            GetRoom(pl.CurrentRoom).DisconnectPlayer(pl);
 
             Log.Game(string.Format("Player {0} has disconnected", pl.Name));
         }
@@ -151,10 +152,10 @@ namespace RAOServer {
 
                 var jsonData = JToken.Parse(json["data"].ToString());
 
-                if (connection.Player == null)
-                    Log.Debug(string.Format("{2} Msg from {0}: {1}", connection.ID, json["data"], json["type"]));
-                else
-                    Log.Debug(string.Format("{2} Msg from {0}: {1}", connection.Player.Name, json["data"], json["type"]));
+//                if (connection.Player == null)
+//                    Log.Debug(string.Format("{2} Msg from {0}: {1}", connection.ID, json["data"], json["type"]));
+//                else
+//                    Log.Debug(string.Format("{2} Msg from {0}: {1}", connection.Player.Name, json["data"], json["type"]));
 
                 switch (json["type"].ToString()){
                     case MsgDict.ClientConnect:
@@ -235,7 +236,7 @@ namespace RAOServer {
             }
 
             if (rm != null){
-                rm.ConnectPlayer(connection);
+                rm.ConnectPlayer(connection.Player);
                 connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeSuccessful));
             }
             else{

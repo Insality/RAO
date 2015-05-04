@@ -55,13 +55,18 @@ namespace RAOServer.Game {
             return info;
         }
 
-        internal void ConnectPlayer(RAOConnection connection) {
+        internal void ConnectPlayer(Player.Player player) {
             if (_players.Count >= MaxPlayers){
                 throw new GameRoomMaxPlayers();
             }
 
-            _players.Add(connection.Player);
-            connection.Player.ConnectToRoom(Id);
+            _players.Add(player);
+            player.ConnectToRoom(Id);
+        }
+
+        internal void DisconnectPlayer(Player.Player player) {
+            _players.Remove(player);
+            player.ConnectToLobby();
         }
     }
 }

@@ -43,11 +43,8 @@
 	function getStatus(){
 		a = getRequestForm();
 		a["type"] = "status";
-		// a["data"] = {"requests": request_list}
 		return a;
 	}
-
-
 
 
 	// CONNECTIONS SETTINGS
@@ -58,7 +55,7 @@
 		log("Connection opened to "+ URL);
 		};
 	ws.onclose = function(event){ log("Connection close. Reason: " + event.reason + ":" + event.code); };
-	ws.onmessage = function(event){ log("Response: " + event.data); };
+	ws.onmessage = function(event){ log("Response: " + event.data); handleMessage(event.data); };
 	ws.onerror = function(error){ log("Got error: " + error.message); };
 
 	function send(json){
@@ -74,5 +71,41 @@
 	document.getElementById('disconnect').addEventListener('click', function(){ send(getDisconnect()); }, false);
 	document.getElementById('request').addEventListener('click', function(){ send(getRequest(["roomlist", "map"])); }, false);
 	document.getElementById('status').addEventListener('click', function(){ send(getStatus()) }, false);
+
+
+
+	// RENDER FUNCTIONS
+	// ================
+	var canvas = document.getElementById("myCanvas").getContext("2d");
+	var width = 16;
+
+	var img_wall = new Image();
+	img_wall.src = "images/wall.png"
+
+	var img_floor = new Image();
+	img_floor.src = "images/floor.png"
+
+	function handleMessage(data){
+		json = JSON.parse(data);
+		if (json["type"] == "information") {
+			// console.log(json["data"]);
+			jsonData = JSON.parse(json["data"].replace(/'/g, '"'));
+			if (jsonData["map"]){
+				map = jsonData["map"].split('\n');
+				for (i in map){
+					map_row = map[i];
+					for (j in map_row){
+						if (map_row[j] == "#"){
+							canvas.drawImage(img_wall, j*width, i*width);
+						}
+						else if (map_row[j] == "."){
+							canvas.drawImage(img_floor, j*width, i*width);
+						}
+					}
+				}
+			}
+		}
+	}
+
 })();
 
