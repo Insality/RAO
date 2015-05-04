@@ -17,6 +17,7 @@ namespace RAOServer.Network {
 
         public const int CodeSuccessful = 200;
         public const int CodeForbidden = 403;
+        public const int CodeServerError = 500;
         public const int CodeIncorrectApiVersion = 1;
         public const int CodeIncorrectDataFormat = 2;
         public const int CodeIncorrectDataValues = 3;
@@ -47,6 +48,7 @@ namespace RAOServer.Network {
         public static Dictionary<int, string> MsgCode = new Dictionary<int, string> {
             {CodeSuccessful, "successful"},
             {CodeForbidden, "forbidden"},
+            {CodeServerError, "server.error"},
             {CodeIncorrectApiVersion, "api.incorrect_version"},
             {CodeIncorrectDataFormat, "json.incorrect_format"},
             {CodeIncorrectDataValues, "json.incorrect_data"},

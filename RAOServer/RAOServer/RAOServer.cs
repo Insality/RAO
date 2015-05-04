@@ -73,6 +73,15 @@ namespace RAOServer {
             return _serverRooms;
         }
 
+        public RAORoom GetRoom(int index) {
+            if (index == -1){
+                throw new PlayerNotInGame();
+            }
+
+            var room = _serverRooms.Find(rm=>rm.Id == index);
+            return room;
+        }
+
         public List<Player> GetPlayers() {
             return _allPlayers;
         }
@@ -175,7 +184,7 @@ namespace RAOServer {
                     connection.SendData(ServerMessage.ResponseCode((ex as RAOException).Code));
                 }
                 else{
-                    Log.Error("Got exception in Handle message: " + ex);
+                    _handleError(connection, ex);
                 }
             }
         }
@@ -245,11 +254,12 @@ namespace RAOServer {
             var requests = jsonData["requests"];
 
             if (requests.ToList().Contains("roomlist")){
-                var roomlist = new List<JObject>();
-                foreach (var room in GetRooms()){
-                    roomlist.Add(room.GetInfo());
-                }
+                var roomlist = GetRooms().Select(room=>room.GetInfo()).ToList();
                 data.Add("roomlist", JToken.FromObject(roomlist));
+            }
+
+            if (requests.ToList().Contains("map")) {
+                data.Add("map", GetRoom(connection.Player.CurrentRoom).GetStringMap());
             }
 
             sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
@@ -264,6 +274,11 @@ namespace RAOServer {
 
             sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
             connection.SendData(sm.Serialize());
+        }
+
+        private void _handleError(RAOConnection connection, Exception ex) {
+            connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeServerError));
+            Log.Error("Got exception in Handle message: " + ex);
         }
     }
 }
