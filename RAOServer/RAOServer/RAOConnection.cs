@@ -6,8 +6,8 @@ using WebSocketSharp.Server;
 namespace RAOServer {
     internal class RAOConnection: WebSocketBehavior {
         private readonly RAOServer _server;
-        public string SessionId;
         public Player Player;
+        public string SessionId;
 
         public RAOConnection() {
             _server = RAOServer.Instance;
@@ -18,7 +18,7 @@ namespace RAOServer {
         }
 
         public void CloseConnection(string message) {
-           Sessions.CloseSession(ID, CloseStatusCode.Normal, message);
+            Sessions.CloseSession(ID, CloseStatusCode.Normal, message);
         }
 
         protected override void OnMessage(MessageEventArgs e) {

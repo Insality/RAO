@@ -90,7 +90,7 @@ namespace RAOServer {
         }
 
         public void CheckPlayersOnline() {
-            foreach (Player player in _allPlayers.ToList()){
+            foreach (var player in _allPlayers.ToList()){
                 if (!_webSocketServer.WebSocketServices[Settings.GameRoute].Sessions.IDs.Contains(player.Id)){
                     RemovePlayer(player.Id);
                 }
@@ -107,7 +107,7 @@ namespace RAOServer {
         }
 
         public void RemovePlayer(string id) {
-            Player pl = _allPlayers.Find(player=>player.Id == id);
+            var pl = _allPlayers.Find(player=>player.Id == id);
             _allPlayers.Remove(pl);
 
             Log.Game(string.Format("Player {0} has disconnected", pl.Name));
@@ -120,7 +120,7 @@ namespace RAOServer {
         /// </summary>
         public void HandleMessage(string data, RAOConnection connection) {
             try{
-                JToken json = JToken.Parse(data);
+                var json = JToken.Parse(data);
 
                 // Проверка на наличие необходимых ключей
                 if (MsgDict.ClientRequestKeys.Any(key=>json[key] == null)){
@@ -140,7 +140,7 @@ namespace RAOServer {
                     throw new InvalidDataValues();
                 }
 
-                JToken jsonData = JToken.Parse(json["data"].ToString());
+                var jsonData = JToken.Parse(json["data"].ToString());
 
                 if (connection.Player == null)
                     Log.Debug(string.Format("{2} Msg from {0}: {1}", connection.ID, json["data"], json["type"]));
@@ -149,21 +149,19 @@ namespace RAOServer {
 
                 switch (json["type"].ToString()){
                     case MsgDict.ClientConnect:
-                        HandleConnect(connection, json, jsonData);
+                        _handleConnect(connection, json, jsonData);
                         break;
                     case MsgDict.ClientConnectRoom:
-                        HandleConnectRoom(connection, json, jsonData);
+                        _handleConnectRoom(connection, json, jsonData);
                         break;
                     case MsgDict.ClientStatus:
-                        HandleStatus(connection, json, jsonData);
+                        _handleStatus(connection, json, jsonData);
                         break;
                     case MsgDict.ClientRequest:
-                        HandleRequest(connection, json, jsonData);
+                        _handleRequest(connection, json, jsonData);
                         break;
                     case MsgDict.ClientDisconnect:
-                        if (connection.Player != null)
-                            RemovePlayer(connection.ID);
-                        connection.CloseConnection("Disconnect by user");
+                        _handleDisconnect(connection, json, jsonData);
                         break;
                     case MsgDict.ClientControl:
                         break;
@@ -183,7 +181,7 @@ namespace RAOServer {
         }
 
 
-        private void HandleConnect(RAOConnection connection, JToken json, JToken jsonData) {
+        private void _handleConnect(RAOConnection connection, JToken json, JToken jsonData) {
             if (connection.Player != null){
                 throw new AlreadyLogged();
             }
@@ -191,11 +189,11 @@ namespace RAOServer {
                 throw new InvalidDataFormat();
             }
 
-            string login = jsonData["login"].ToString();
-            string password = jsonData["password"].ToString();
+            var login = jsonData["login"].ToString();
+            var password = jsonData["password"].ToString();
 
             if (login == "" && password == ""){
-                Player player = RegisterPlayer(connection.ID, "InsalityTEST");
+                var player = RegisterPlayer(connection.ID, "InsalityTEST");
                 connection.Player = player;
                 connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeSuccessful));
             }
@@ -204,7 +202,13 @@ namespace RAOServer {
             }
         }
 
-        private void HandleConnectRoom(RAOConnection connection, JToken json, JToken jsonData) {
+        private void _handleDisconnect(RAOConnection connection, JToken json, JToken jsonData) {
+            if (connection.Player != null)
+                RemovePlayer(connection.ID);
+            connection.CloseConnection("Disconnect by user");
+        }
+
+        private void _handleConnectRoom(RAOConnection connection, JToken json, JToken jsonData) {
             if (jsonData["index"] == null){
                 throw new InvalidDataFormat();
             }
@@ -212,7 +216,7 @@ namespace RAOServer {
                 throw new PlayerNotInLobby();
             }
 
-            JToken roomIndex = jsonData["index"];
+            var roomIndex = jsonData["index"];
             RAORoom rm;
             try{
                 rm = _serverRooms.Find(room=>room.Id == int.Parse(roomIndex.ToString()));
@@ -230,7 +234,7 @@ namespace RAOServer {
             }
         }
 
-        private void HandleRequest(RAOConnection connection, JToken json, JToken jsonData) {
+        private void _handleRequest(RAOConnection connection, JToken json, JToken jsonData) {
             if (jsonData["requests"] == null){
                 throw new InvalidDataFormat();
             }
@@ -238,11 +242,11 @@ namespace RAOServer {
             var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerInformation};
 
             var data = new JObject();
-            JToken requests = jsonData["requests"];
+            var requests = jsonData["requests"];
 
             if (requests.ToList().Contains("roomlist")){
                 var roomlist = new List<JObject>();
-                foreach (RAORoom room in GetRooms()){
+                foreach (var room in GetRooms()){
                     roomlist.Add(room.GetInfo());
                 }
                 data.Add("roomlist", JToken.FromObject(roomlist));
@@ -252,8 +256,8 @@ namespace RAOServer {
             connection.SendData(sm.Serialize());
         }
 
-        private void HandleStatus(RAOConnection connection, JToken json, JToken jsonData) {
-            var sm = new ServerMessage { Code = 200, Type = MsgDict.ServerStatus };
+        private void _handleStatus(RAOConnection connection, JToken json, JToken jsonData) {
+            var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerStatus};
 
             var data = new JObject();
             data.Add("player", connection.Player.GetInfo());

@@ -37,7 +37,7 @@ namespace RAOServer.Game {
         }
 
         public string GetStringMap() {
-            string str = "";
+            var str = "";
             foreach (var tileRow in _map.Tiles){
                 str += string.Join("", tileRow);
                 str += '\n';

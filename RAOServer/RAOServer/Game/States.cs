@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RAOServer.Game {
-    class States {
+﻿namespace RAOServer.Game {
+    internal class States {
         public const string RoomWaiting = "room.waiting";
         public const string RoomPlaying = "room.playing";
         public const string RoomOver = "room.over";

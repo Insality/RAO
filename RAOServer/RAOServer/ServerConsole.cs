@@ -33,43 +33,64 @@ namespace RAOServer {
         }
 
         private void ProcessCommand(string command) {
-            string arg = command.Split(' ').Last();
+            var arg = command.Split(' ').Last();
             command = command.Split(' ').First();
             switch (command){
                 case "list":
-                    Log.Terminal("Connections: " + _ws.WebSocketServices.SessionCount);
-
-                    foreach (var player in _server.GetPlayers()){
-                        Log.Terminal("Player: " + player);
-                    }
-                    break;
+                    _commandList();
+                    return;
                 case "listroom":
-                    foreach (var room in _server.GetRooms()){
-                        Log.Terminal("Room: " + room.Id);
-                    }
-                    break;
+                    _commandListRoom();
+                    return;
                 case "newroom":
-                    var newRoom = new RAORoom(_server);
-                    Log.Network("New room: " + newRoom.Id);
-                    _server.GetRooms().Add(newRoom);
-                    break;
+                    _commandNewRoom();
+                    return;
                 case "removeroom":
-                    _server.GetRooms().Remove(_server.GetRooms().Find(room=>room.Id == int.Parse(arg)));
-                    break;
+                    _commandRemoveRoom(arg);
+                    return;
                 case "help":
-                    Log.Terminal(String.Join("\n", _commandsList));
-                    break;
-                case "check":
-                    _server.CheckPlayersOnline();
-                    break;
+                    _commandHelp();
+                    return;
                 case "exit":
-                    _ws.Stop(CloseStatusCode.Normal, "Shutdown");
-                    Environment.Exit(0);
-                    break;
+                    _commandExit();
+                    return;
                 default:
                     Log.Terminal("Unknown command, print help to command list");
                     break;
             }
+        }
+
+        private void _commandList() {
+            Log.Terminal("Connections: " + _ws.WebSocketServices.SessionCount);
+
+            foreach (var player in _server.GetPlayers()){
+                Log.Terminal("Player: " + player);
+            }
+        }
+
+        private void _commandListRoom() {
+            foreach (var room in _server.GetRooms()){
+                Log.Terminal("Room: " + room.Id);
+            }
+        }
+
+        private void _commandNewRoom() {
+            var newRoom = new RAORoom(_server);
+            Log.Network("New room: " + newRoom.Id);
+            _server.GetRooms().Add(newRoom);
+        }
+
+        private void _commandRemoveRoom(string arg) {
+            _server.GetRooms().Remove(_server.GetRooms().Find(room=>room.Id == int.Parse(arg)));
+        }
+
+        private void _commandHelp() {
+            Log.Terminal(String.Join("\n", _commandsList));
+        }
+
+        private void _commandExit() {
+            _ws.Stop(CloseStatusCode.Normal, "Shutdown");
+            Environment.Exit(0);
         }
     }
 }

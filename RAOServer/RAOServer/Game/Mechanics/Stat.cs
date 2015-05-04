@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RAOServer.Game.Mechanics {
-    class Stat {
-        public int Max;
+﻿namespace RAOServer.Game.Mechanics {
+    internal class Stat {
         public int Current;
+        public int Max;
 
         public Stat(int max) {
             Max = max;

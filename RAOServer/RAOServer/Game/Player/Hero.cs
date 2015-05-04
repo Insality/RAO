@@ -2,9 +2,9 @@
 
 namespace RAOServer.Game.Player {
     internal class Hero {
-        public int Level;
-        public Stat Health;
-        public Stat Endurance;
         public Stat Damage;
+        public Stat Endurance;
+        public Stat Health;
+        public int Level;
     }
 }

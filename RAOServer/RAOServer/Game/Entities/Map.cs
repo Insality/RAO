@@ -9,10 +9,10 @@ namespace RAOServer.Game {
         public void LoadMapFromFile(string filename) {
             Tiles = new List<List<Tile>>();
 
-            string s = File.ReadAllText(filename);
+            var s = File.ReadAllText(filename);
             var tileMap = new List<string>(s.Split('\n'));
 
-            for (int i = 0; i < tileMap.Count; i++){
+            for (var i = 0; i < tileMap.Count; i++){
                 tileMap[i] = tileMap[i].TrimEnd('\r');
             }
 
