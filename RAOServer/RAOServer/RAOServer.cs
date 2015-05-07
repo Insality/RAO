@@ -96,6 +96,13 @@ namespace RAOServer {
 
             // For the information about this: https://github.com/sta/websocket-sharp           
             _webSocketServer.Start();
+
+            _webSocketServer.KeepClean = false;
+            _webSocketServer.ReuseAddress = true;
+            Log.Debug(_webSocketServer.WaitTime.ToString());
+//            Log.Debug(_webSocketServer.WebSocketServices[Settings.GameRoute].KeepClean.ToString());
+            _webSocketServer.WebSocketServices[Settings.GameRoute].KeepClean = false;
+//            Log.Debug(_webSocketServer.WebSocketServices[Settings.GameRoute].WaitTime.ToString());
         }
 
         public void CheckPlayersOnline() {
@@ -174,6 +181,7 @@ namespace RAOServer {
                         _handleDisconnect(connection, json, jsonData);
                         break;
                     case MsgDict.ClientControl:
+                        _handleControl(connection, json, jsonData);
                         break;
                 }
             }
@@ -279,6 +287,21 @@ namespace RAOServer {
 
             sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
             connection.SendData(sm.Serialize());
+        }
+
+        private void _handleControl(RAOConnection connection, JToken json, JToken jsonData) {
+            if (jsonData["action"] == null) {
+                throw new InvalidDataFormat();
+            }
+
+            if (!MsgDict.ClientControlCommands.Contains(jsonData["action"].ToString())){
+                throw new InvalidDataValues();
+            }
+
+            connection.Player.Hero.Action(jsonData["action"].ToString());
+
+//            connection.SendData();
+            connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeSuccessful));
         }
 
         private void _handleError(RAOConnection connection, Exception ex) {

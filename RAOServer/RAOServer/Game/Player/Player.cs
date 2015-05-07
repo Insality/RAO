@@ -17,7 +17,7 @@ namespace RAOServer.Game.Player {
             Name = name;
             CurrentRoom = -1;
             State = States.PlayerLobby;
-            Hero = new Hero();
+            Hero = new Hero(null);
         }
 
         public override string ToString() {

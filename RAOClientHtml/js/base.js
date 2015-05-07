@@ -46,6 +46,13 @@
 		return a;
 	}
 
+	function getControl(action){
+		a = getRequestForm();
+		a["type"] = "control";
+		a["data"] = {"action": action};
+		return a;
+	}
+
 
 	// CONNECTIONS SETTINGS
 	// ====================
@@ -73,6 +80,12 @@
 	document.getElementById('status').addEventListener('click', function(){ send(getStatus()) }, false);
 
 
+	document.getElementById('control_up').addEventListener('click', function(){ send(getControl(this.id)) }, false);
+	document.getElementById('control_down').addEventListener('click', function(){ send(getControl(this.id)) }, false);
+	document.getElementById('control_left').addEventListener('click', function(){ send(getControl(this.id)) }, false);
+	document.getElementById('control_right').addEventListener('click', function(){ send(getControl(this.id)) }, false);
+	document.getElementById('control_action').addEventListener('click', function(){ send(getControl(this.id)) }, false);
+
 
 	// RENDER FUNCTIONS
 	// ================
@@ -84,6 +97,9 @@
 
 	var img_floor = new Image();
 	img_floor.src = "images/floor.png"
+
+	var img_player = new Image();
+	img_player.src = "images/player.png"
 
 	function handleMessage(data){
 		json = JSON.parse(data);
@@ -104,8 +120,28 @@
 					}
 				}
 			}
+
+			if (jsonData["players"]){
+				players = jsonData["players"];
+				for (player in players){
+					hero = players[player]["Hero"];
+					canvas.drawImage(img_player, hero["X"] * width, hero["Y"] * width);
+				}
+			};
 		}
 	}
+
+	// UPDATE FUNCTIONS
+	// ================
+	setInterval(function(){ send(getRequest(["map", "players"])); console.log(ws.readyState) }, 333);
+
+	$('body').on('keydown',function(e){
+		if (e.keyCode == 87) { send(getControl("control_up")) };
+		if (e.keyCode == 83) { send(getControl("control_down")) };
+		if (e.keyCode == 65) { send(getControl("control_left")) };
+		if (e.keyCode == 68) { send(getControl("control_right")) };
+		if (e.keyCode == 32) { send(getControl("control_action")) };
+	});
 
 })();
 

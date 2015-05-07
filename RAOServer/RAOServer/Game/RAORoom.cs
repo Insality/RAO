@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using RAOServer.Game.Player;
 using RAOServer.Network;
 using RAOServer.Utils;
 
@@ -33,6 +34,10 @@ namespace RAOServer.Game {
             }
         }
 
+        public List<List<Tile>> GetTiles() {
+            return _map.Tiles;
+        }
+
         public int GetPlayersCount() {
             return _players.Count;
         }
@@ -57,7 +62,7 @@ namespace RAOServer.Game {
         }
 
         public JToken GetPlayersInfo() {
-            var playersInfo = _players.Select(room => room.GetInfo()).ToList();
+            var playersInfo = _players.Select(room=>room.GetInfo()).ToList();
             return JToken.FromObject(playersInfo);
         }
 
@@ -70,6 +75,8 @@ namespace RAOServer.Game {
             player.ConnectToRoom(Id);
 
             Log.Game(string.Format("Player {0} joined to room {1}", player.Name, Id));
+
+            player.Hero = new Hero(this) {X = 3, Y = 5};
         }
 
         internal void DisconnectPlayer(Player.Player player) {
