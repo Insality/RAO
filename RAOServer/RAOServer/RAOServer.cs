@@ -263,6 +263,10 @@ namespace RAOServer {
                 data.Add("map", GetRoom(connection.Player.CurrentRoom).GetStringMap());
             }
 
+            if (requests.ToList().Contains("players")) {
+                data.Add("players", GetRoom(connection.Player.CurrentRoom).GetPlayersInfo());
+            }
+
             sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
             connection.SendData(sm.Serialize());
         }

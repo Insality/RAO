@@ -17,6 +17,7 @@ namespace RAOServer.Game.Player {
             Name = name;
             CurrentRoom = -1;
             State = States.PlayerLobby;
+            Hero = new Hero();
         }
 
         public override string ToString() {
@@ -24,7 +25,7 @@ namespace RAOServer.Game.Player {
         }
 
         public JToken GetInfo() {
-            var info = new JObject {{"Name", Name}, {"Hero", "None"}, {"CurrentRoom", CurrentRoom}, {"State", State}};
+            var info = new JObject {{"Name", Name}, {"Hero", Hero.GetInfo()}, {"CurrentRoom", CurrentRoom}, {"State", State}};
             return info;
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 using RAOServer.Network;
 using RAOServer.Utils;
@@ -53,6 +54,11 @@ namespace RAOServer.Game {
                 {"State", State}
             };
             return info;
+        }
+
+        public JToken GetPlayersInfo() {
+            var playersInfo = _players.Select(room => room.GetInfo()).ToList();
+            return JToken.FromObject(playersInfo);
         }
 
         internal void ConnectPlayer(Player.Player player) {
