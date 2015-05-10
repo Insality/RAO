@@ -9,11 +9,19 @@ body {
 	border: 1px solid #9c9898;
 	width: 600px;
 	height: 400px;
+	display: inline-block;
 
 	background-color: #fff
 }
 
 #logger{
 	margin-top: 64px;
+	white-space: pre-wrap;
+}
+
+#chat_box{
+	position: absolute;
+	display: inline-block;
+	margin-left: 24px;
 	white-space: pre-wrap;
 }

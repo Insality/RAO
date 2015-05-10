@@ -34,8 +34,12 @@ namespace RAOServer.Utils {
             Console.WriteLine(text);
         }
 
+        public static string GetTime() {
+            return DateTime.Now.ToString("[HH:mm:ss]: ");
+        }
+
         private static void _print(string text) {
-            var curTime = DateTime.Now.ToString("[HH:mm:ss]: ");
+            var curTime = GetTime();
             Console.WriteLine(curTime + text);
             Console.ForegroundColor = ConsoleColor.White;
 

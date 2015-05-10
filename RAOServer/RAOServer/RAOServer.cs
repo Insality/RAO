@@ -176,6 +176,9 @@ namespace RAOServer {
                     case MsgDict.ClientControl:
                         _handleControl(connection, jsonData);
                         break;
+                    case MsgDict.ClientChat:
+                        _handleChat(connection, jsonData);
+                        break;
                 }
             }
             catch (Exception ex){
@@ -204,7 +207,7 @@ namespace RAOServer {
             var password = jsonData["password"].ToString();
 
             if (login == "" && password == ""){
-                var player = RegisterPlayer(connection.ID, "InsalityTEST", connection);
+                var player = RegisterPlayer(connection.ID, "InsalityTEST" + new Random().Next(10, 99), connection);
                 connection.Player = player;
                 connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeSuccessful));
             }
@@ -257,7 +260,7 @@ namespace RAOServer {
                 throw new InvalidDataFormat();
             }
 
-            var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerInformation};
+            var sm = new ServerMessage {Code = MsgDict.CodeSuccessful, Type = MsgDict.ServerInformation};
 
             var data = new JObject();
             var requests = jsonData["requests"];
@@ -297,6 +300,38 @@ namespace RAOServer {
 
             sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
             connection.SendData(sm.Serialize());
+        }
+
+        private void _handleChat(RAOConnection connection, JToken jsonData) {
+            if (jsonData["message"] == null){
+                throw new InvalidDataFormat();
+            }
+            if (jsonData["message"].ToString() == ""){
+                throw new InvalidDataValues();
+            }
+
+            var location = "Lobby";
+            if (connection.Player.State == PlayerStates.PlayerGame){
+                location = "Room#" + connection.Player.CurrentRoom.Id;
+            }
+            var msg = jsonData["message"].ToString();
+            msg = string.Format("[{0}] {1}: {2}", location, connection.Player.Name, msg);
+            Log.Game(msg);
+
+            var sm = new ServerMessage {Code = MsgDict.CodeSuccessful, Type = MsgDict.ServerInformation};
+            var data = new JObject {{"chat", msg}};
+            sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
+
+            if (connection.Player.State == PlayerStates.PlayerLobby){
+                foreach (var pl in _allPlayers.Where(pl=>pl.State == PlayerStates.PlayerLobby)){
+                    pl.Connection.SendData(sm.Serialize());
+                }
+            }
+            else{
+                foreach (var pl in connection.Player.CurrentRoom.GetPlayers()){
+                    pl.Connection.SendData(sm.Serialize());
+                }
+            }
         }
 
         private void _handleControl(RAOConnection connection, JToken jsonData) {

@@ -9,6 +9,7 @@
 <body>
 	<div id="wrapper">
 		<canvas id="myCanvas" width="600", height="400"></canvas>
+
 		<div id="buttonWrapper">
 			<input type="button" id="connect" value="Connect">
 			<input type="button" id="connect_room" value="Connect room">
@@ -36,12 +37,17 @@
 			Requests:
 			<input type="text" id="requests" placeholder="requests here", value="map players">
 			</br>
+			<input type="text" id="chat_text" placeholder="message here">
+			<input type="button" id="chat_button" value="Send">
+			</br>
 			Turn:
 			<div id="turn_counter">0</div>
 		</div>
 		<div id="logger">
 		</div>
 	</div>
+
+	<div id="chat_box">Chat:</div>
 
 	<script src="js/base.js"></script>
 </body>

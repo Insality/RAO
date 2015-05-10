@@ -8,6 +8,7 @@ namespace RAOServer.Network {
         public const string ClientControl = "control";
         public const string ClientRequest = "request";
         public const string ClientStatus = "status";
+        public const string ClientChat = "chat";
 
 
         public const string ServerInformation = "information";
@@ -46,7 +47,8 @@ namespace RAOServer.Network {
             ClientControl,
             ClientDisconnect,
             ClientRequest,
-            ClientStatus
+            ClientStatus,
+            ClientChat
         };
 
 

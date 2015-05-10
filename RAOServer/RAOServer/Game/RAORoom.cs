@@ -41,8 +41,8 @@ namespace RAOServer.Game {
             return _map.Tiles;
         }
 
-        public int GetPlayersCount() {
-            return _players.Count;
+        public List<Player.Player> GetPlayers() {
+            return _players;
         }
 
         public void OnTimedEvent(object source, ElapsedEventArgs e) {
@@ -61,7 +61,7 @@ namespace RAOServer.Game {
         public JObject GetInfo() {
             var info = new JObject {
                 {"Id", Id},
-                {"Players", GetPlayersCount()},
+                {"Players", _players.Count},
                 {"MaxPlayers", MaxPlayers},
                 {"State", State},
                 {"Map", _map.GetInfo()},
@@ -75,7 +75,6 @@ namespace RAOServer.Game {
             var players = _players.OrderBy(pl => pl.Hero.Initiative.Current).ToList();
             foreach (var player in players){
                 player.Hero.Action();
-                Log.Game("Players turn " + player.Name + ":" + player.Id);
             }
             // Send to all players game step info:
             var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerInformation};

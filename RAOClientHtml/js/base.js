@@ -57,6 +57,16 @@
 		return a;
 	}
 
+	function getChat(){
+		a = getRequestForm();
+		a["type"] = "chat";
+
+		msg = $("#chat_text").val();
+		$("#chat_text").val("");
+		a["data"] = {"message": msg};
+		return a;
+	}
+
 
 	// CONNECTIONS SETTINGS
 	// ====================
@@ -80,6 +90,7 @@
 	document.getElementById('status').addEventListener('click', function(){ send(getStatus()) }, false);
 	document.getElementById('connect').addEventListener('click', function(){ send(getConnect()) }, false);
 	document.getElementById('request').addEventListener('click', function(){ send(getRequest()); }, false);
+	document.getElementById('chat_button').addEventListener('click', function(){ send(getChat()) }, false);
 	document.getElementById('disconnect').addEventListener('click', function(){ send(getDisconnect()); }, false);
 	document.getElementById('connect_room').addEventListener('click', function(){ send(getConnectRoom()) }, false);
 
@@ -105,6 +116,7 @@
 	var img_player = new Image();
 	img_player.src = "images/player.png"
 
+	chat = []
 	function handleMessage(data){
 		json = JSON.parse(data);
 		if (json["code"] != 200 || json["type"] == "status") {
@@ -112,10 +124,19 @@
 		}
 		if (json["type"] == "information") {
 			jsonData = JSON.parse(json["data"].replace(/'/g, '"'));
+
 			if (jsonData["tick"]){
 				el = $("#turn_counter");
 				el.text( parseInt(el.text()) + 1);
 			}
+
+			if (jsonData["chat"]){
+				msg = jsonData["chat"];
+				chat.splice(0, 0, msg);
+				chat = chat.slice(0, 20);
+				$("#chat_box").text(chat.join("\n"));
+			}
+
 			if (jsonData["map"]){
 				map = jsonData["map"].split('\n');
 				for (i in map){
