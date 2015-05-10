@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RAOServer.Game.Player {
+namespace RAOServer.Game.PlayerStuff {
     internal class PlayerStatistic {
         public int GamePlayed;
         public int GameWin;

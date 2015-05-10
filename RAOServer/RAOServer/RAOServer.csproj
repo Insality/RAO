@@ -66,11 +66,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game\Entity.cs" />
     <Compile Include="Game\Entities\Map.cs" />
     <Compile Include="Game\Mechanics\Stat.cs" />
-    <Compile Include="Game\Player\Hero.cs" />
-    <Compile Include="Game\Player\Player.cs" />
-    <Compile Include="Game\Player\PlayerStatistic.cs" />
+    <Compile Include="Game\PlayerStuff\Hero.cs" />
+    <Compile Include="Game\PlayerStuff\Player.cs" />
+    <Compile Include="Game\PlayerStuff\PlayerStatistic.cs" />
     <Compile Include="Game\RAORoom.cs" />
     <Compile Include="Game\Entities\Tile.cs" />
     <Compile Include="Game\States.cs" />

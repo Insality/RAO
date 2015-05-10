@@ -119,6 +119,7 @@
 	chat = []
 	function handleMessage(data){
 		json = JSON.parse(data);
+		log(data);
 		if (json["code"] != 200 || json["type"] == "status") {
 			log(data);
 		}

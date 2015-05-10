@@ -1,22 +1,16 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
 using RAOServer.Game.Mechanics;
+using RAOServer.Utils;
 
-namespace RAOServer.Game.Player {
-    internal class Hero {
+namespace RAOServer.Game.PlayerStuff {
+    internal class Hero:Entity {
         private readonly RAORoom _room;
-        public Stat Damage;
         public Stat Endurance;
-        public Stat Health;
         public Stat Initiative;
         public int Level;
         public char Sym;
-        private string _lastAction;
-
-        public int X;
-        public int Y;
-
-        public Hero(RAORoom room) {
+        public Hero(RAORoom room): base("player", "player") {
             Damage = new Stat(10);
             Endurance = new Stat(50);
             Health = new Stat(100);
@@ -27,12 +21,9 @@ namespace RAOServer.Game.Player {
             Sym = '@';
         }
 
-        public void ActionQueue(string action) {
-            _lastAction = action;
-        }
-
-        public void Action() {
-            switch (_lastAction){
+        public override void Action() {
+            base.Action();
+            switch (LastAction){
                 case "control_up":
                     if (!_room.GetTiles()[Y - 1][X].IsSolid){
                         Y--;
@@ -54,19 +45,14 @@ namespace RAOServer.Game.Player {
                     }
                     break;
             }
-            _lastAction = "";
+            LastAction = "";
         }
 
-        public JToken GetInfo() {
-            var info = new JObject {
-                {"Damage", Damage.Current},
-                {"Health", Health.Current},
-                {"Level", Level},
-                {"Sym", Sym},
-                {"Initiative", Initiative.Current},
-                {"X", X},
-                {"Y", Y}
-            };
+        public override JObject GetInfo() {
+            var info = base.GetInfo();
+
+            info.Add("Level", Level);
+            info.Add("Initiative", Initiative.Current);
             return info;
         }
     }

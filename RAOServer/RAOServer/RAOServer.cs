@@ -6,7 +6,7 @@ using System.Timers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RAOServer.Game;
-using RAOServer.Game.Player;
+using RAOServer.Game.PlayerStuff;
 using RAOServer.Network;
 using RAOServer.Utils;
 using WebSocketSharp.Server;
@@ -121,10 +121,13 @@ namespace RAOServer {
 
         public void RemovePlayer(string id) {
             var pl = _allPlayers.Find(player=>player.Id == id);
-            _allPlayers.Remove(pl);
-            pl.CurrentRoom.DisconnectPlayer(pl);
+            if (pl != null){
+                _allPlayers.Remove(pl);
 
-            Log.Game(string.Format("Player {0} has disconnected", pl.Name));
+                if (pl.CurrentRoom != null)
+                    pl.CurrentRoom.DisconnectPlayer(pl);
+                Log.Game(string.Format("Player {0} has disconnected", pl.Name));
+            }   
         }
 
 
@@ -322,12 +325,12 @@ namespace RAOServer {
             msg = string.Format("[Lobby] {0}: {1}", sender, msg);
             Log.Game(msg);
 
-            var sm = new ServerMessage { Code = MsgDict.CodeSuccessful, Type = MsgDict.ServerInformation };
-            var data = new JObject { { "chat", msg } };
+            var sm = new ServerMessage {Code = MsgDict.CodeSuccessful, Type = MsgDict.ServerInformation};
+            var data = new JObject {{"chat", msg}};
             sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
 
             foreach (var pl in _allPlayers.Where(pl=>pl.State == PlayerStates.PlayerLobby)){
-                    pl.Connection.SendData(sm.Serialize());
+                pl.Connection.SendData(sm.Serialize());
             }
         }
 

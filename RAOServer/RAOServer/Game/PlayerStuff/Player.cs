@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using RAOServer.Network;
 
-namespace RAOServer.Game.Player {
+namespace RAOServer.Game.PlayerStuff {
     internal class Player {
         private readonly RAOServer _server;
         public RAOConnection Connection;

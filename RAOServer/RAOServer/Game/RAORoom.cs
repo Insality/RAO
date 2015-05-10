@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Timers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RAOServer.Game.Player;
+using RAOServer.Game.PlayerStuff;
 using RAOServer.Network;
 using RAOServer.Utils;
 
@@ -17,18 +16,18 @@ namespace RAOServer.Game {
     internal class RAORoom {
         private static int _roomCounter;
         private readonly Map _map = new Map();
-        private readonly List<Player.Player> _players;
+        private readonly List<Player> _players;
         private readonly Timer timer;
         public int Id;
         public int MaxPlayers;
-        public string State;
+        public RoomStates State;
         private RAOServer _server;
 
         public RAORoom(int maxPlayers, int turnTime) {
             Id = _roomCounter++;
-            State = States.RoomWaiting;
+            State = RoomStates.RoomWaiting;
             MaxPlayers = maxPlayers;
-            _players = new List<Player.Player>();
+            _players = new List<Player>();
             _server = RAOServer.Instance;
             _map.LoadMapFromFile("testMap.txt");
 
@@ -42,7 +41,7 @@ namespace RAOServer.Game {
             return _map.Tiles;
         }
 
-        public List<Player.Player> GetPlayers() {
+        public List<Player> GetPlayers() {
             return _players;
         }
 
@@ -64,7 +63,7 @@ namespace RAOServer.Game {
                 {"Id", Id},
                 {"Players", _players.Count},
                 {"MaxPlayers", MaxPlayers},
-                {"State", State},
+                {"State", State.ToString()},
                 {"Map", _map.GetInfo()},
                 {"TurnTime", timer.Interval}
             };
@@ -73,7 +72,7 @@ namespace RAOServer.Game {
 
         public void GameTick() {
             // Do all player actions:
-            var players = _players.OrderBy(pl => pl.Hero.Initiative.Current).ToList();
+            var players = _players.OrderBy(pl=>pl.Hero.Initiative.Current).ToList();
             foreach (var player in players){
                 player.Hero.Action();
             }
@@ -96,7 +95,7 @@ namespace RAOServer.Game {
             return JToken.FromObject(playersInfo);
         }
 
-        internal void ConnectPlayer(Player.Player player) {
+        internal void ConnectPlayer(Player player) {
             if (_players.Count >= MaxPlayers){
                 throw new GameRoomMaxPlayers();
             }
@@ -109,7 +108,7 @@ namespace RAOServer.Game {
             player.Hero = new Hero(this) {X = 3, Y = 5};
         }
 
-        internal void DisconnectPlayer(Player.Player player) {
+        internal void DisconnectPlayer(Player player) {
             _players.Remove(player);
             player.ConnectToLobby();
 
