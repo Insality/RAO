@@ -118,14 +118,27 @@
 	var img_player = new Image();
 	img_player.src = "images/player.png"
 
-	game = {"map": "", "players": "", "player": ""};
+	var img_pressure_plate = new Image();
+	img_pressure_plate.src = "images/pressure_plate_off.png"
+
+	var img_pressure_plate_on = new Image();
+	img_pressure_plate_on.src = "images/pressure_plate_on.png"
+
+
+	Images = {
+		"Player": img_player,
+		"PressurePlate": img_pressure_plate,
+		"PressurePlateOn": img_pressure_plate_on
+	}
+
+	game = {"map": "", "players": "", "player": "", "entities": ""};
 	myPlayer = {}
 
 	chat = []
 	function handleMessage(data){
 		json = JSON.parse(data);
 		jsonData = JSON.parse(json["data"].replace(/'/g, '"'));
-		// log(data);
+		log(data);
 		if (json["code"] != 200 || json["type"] == "status") {
 			log(data);
 		}
@@ -162,6 +175,10 @@
 					}
 				}
 			}
+
+			if (jsonData["entities"]){
+				game["entities"] = jsonData["entities"];
+			}
 		}
 	}
 
@@ -185,11 +202,18 @@
 			}
 		}
 
-		// Draw players and HP bar:
+		// console.log(game);
+		// Draw entities
+		for (i in game["entities"]){
+			entity = game["entities"][i];
+
+			img = entity["Image"];
+			canvas.drawImage(Images[img], entity["X"] * width - offsetX, entity["Y"] * width - offsetY);
+		}
+
+		// HP bar:
 		for (i in game["players"]){
 			hero = game["players"][i]["Hero"];
-			canvas.drawImage(img_player, hero["X"] * width - offsetX, hero["Y"] * width - offsetY);
-
 			// render simple GUI
 			bar_width = 100;
 			bar_height = 20;
@@ -215,5 +239,4 @@
 		if (e.keyCode == 68) { send(getControl("control_right")) };
 		if (e.keyCode == 32) { send(getControl("control_action")) };
 	});
-
 })();

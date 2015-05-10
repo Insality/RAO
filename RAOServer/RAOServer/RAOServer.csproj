@@ -66,6 +66,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game\Entities\Enviroment\PressurePlate.cs" />
     <Compile Include="Game\Entity.cs" />
     <Compile Include="Game\Entities\Map.cs" />
     <Compile Include="Game\Mechanics\Stat.cs" />

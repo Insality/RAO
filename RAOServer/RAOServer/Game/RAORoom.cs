@@ -4,6 +4,7 @@ using System.Linq;
 using System.Timers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RAOServer.Game.Entities.Enviroment;
 using RAOServer.Game.PlayerStuff;
 using RAOServer.Network;
 using RAOServer.Utils;
@@ -18,12 +19,11 @@ namespace RAOServer.Game {
         private readonly Map _map = new Map();
         private readonly List<Player> _players;
         private readonly Timer timer;
+        public List<Entity> Entities;
         public int Id;
         public int MaxPlayers;
-        public int Turn;
         public RoomStates State;
-
-        public List<Entity> Entities; 
+        public int Turn;
 
         public RAORoom(int maxPlayers, int turnTime) {
             Id = _roomCounter++;
@@ -39,6 +39,11 @@ namespace RAOServer.Game {
             timer.Elapsed += OnTimedEvent;
             timer.Start();
             GC.KeepAlive(timer);
+
+
+            Entities.Add(new PressurePlate(this){X = 7, Y = 7});
+            Entities.Add(new PressurePlate(this){X = 9, Y = 9});
+            Entities.Add(new PressurePlate(this){X = 10, Y = 13});
         }
 
         public List<List<Tile>> GetTiles() {
@@ -87,6 +92,7 @@ namespace RAOServer.Game {
             var data = new JObject();
             data.Add("map", GetStringMap());
             data.Add("players", GetPlayersInfo());
+            data.Add("entities", GetEntitiesInfo());
             data.Add("tick", true);
             sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
 
@@ -98,9 +104,15 @@ namespace RAOServer.Game {
         }
 
         public JToken GetPlayersInfo() {
-            var playersInfo = _players.Select(room=>room.GetInfo()).ToList();
+            var playersInfo = _players.Select(pl=>pl.GetInfo()).ToList();
             return JToken.FromObject(playersInfo);
         }
+
+        public JToken GetEntitiesInfo() {
+            var entitiesInfo = Entities.Select(entitity => entitity.GetInfo()).ToList();
+            return JToken.FromObject(entitiesInfo);
+        }
+
 
         internal void ConnectPlayer(Player player) {
             if (_players.Count >= MaxPlayers){

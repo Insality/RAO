@@ -21,7 +21,6 @@
             Current = Max;
         }
 
-        // TODO: переопределить манипуляцию со статами
         public static Stat operator +(Stat a, int b) {
             a.Current += b;
             return a;

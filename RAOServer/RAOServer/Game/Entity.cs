@@ -6,6 +6,8 @@ namespace RAOServer.Game {
     internal abstract class Entity {
         public Stat Damage;
         public Stat Health;
+        // Можно ли проходить через сущность?
+        public bool IsSolid;
 
         public string Image;
 
@@ -23,6 +25,7 @@ namespace RAOServer.Game {
             Room = room;
             Image = image;
             Name = name;
+            IsSolid = true;
         }
 
         public void ActionQueue(string action) {
@@ -43,6 +46,9 @@ namespace RAOServer.Game {
                 case "control_right":
                     ActionBy(1, 0);
                     break;
+                case "control_action":
+                    ActionBy(0, 0);
+                    break;
             }
             LastAction = "";
         }
@@ -52,6 +58,8 @@ namespace RAOServer.Game {
                 {"Damage", Damage.Current},
                 {"Health", Health.Current},
                 {"HealthMax", Health.Max},
+                {"Name", Name},
+                {"Image", Image},
                 {"X", X},
                 {"Y", Y}
             };
@@ -66,18 +74,15 @@ namespace RAOServer.Game {
 
         public void ActionBy(int x, int y) {
             var entity = Room.GetEntity(X + x, Y + y);
-            if (entity != null){
-                Action(entity);
+            if (entity != null && (entity.IsSolid || (x==0 && y==0))){
+                entity.Action(this);
             }
             else{
                 MoveBy(x, y);
             }
         }
 
-        public void Action(Entity other) {
-            // This doing action on other
-            // now just a damage
-            other.Health.Current -= Damage.Current;
+        public virtual void Action(Entity source) {
         }
     }
 }
