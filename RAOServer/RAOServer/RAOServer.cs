@@ -136,7 +136,7 @@ namespace RAOServer {
         ///     перенаправляет их в нужные места
         /// </summary>
         public void HandleMessage(string data, RAOConnection connection) {
-            Log.Debug("Recieved: " + data);
+//            Log.Debug("Recieved: " + data);
             try{
                 var json = JToken.Parse(data);
 
@@ -347,10 +347,6 @@ namespace RAOServer {
             }
 
             connection.Player.Hero.ActionQueue(jsonData["action"].ToString());
-
-            var data = new JObject {{"requests", JToken.FromObject(new List<String> {"map", "players"})}};
-
-            _handleRequest(connection, data);
             connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeSuccessful));
         }
 

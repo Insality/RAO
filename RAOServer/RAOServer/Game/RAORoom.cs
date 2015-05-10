@@ -21,15 +21,17 @@ namespace RAOServer.Game {
         public int Id;
         public int MaxPlayers;
         public RoomStates State;
-        private RAOServer _server;
+
+        public List<Entity> Entities; 
 
         public RAORoom(int maxPlayers, int turnTime) {
             Id = _roomCounter++;
             State = RoomStates.RoomWaiting;
             MaxPlayers = maxPlayers;
             _players = new List<Player>();
-            _server = RAOServer.Instance;
             _map.LoadMapFromFile("testMap.txt");
+
+            Entities = new List<Entity>();
 
             timer = new Timer(turnTime);
             timer.Elapsed += OnTimedEvent;
@@ -41,8 +43,8 @@ namespace RAOServer.Game {
             return _map.Tiles;
         }
 
-        public List<Player> GetPlayers() {
-            return _players;
+        public Entity GetEntity(int x, int y) {
+            return Entities.Find(ent=>ent.X == x && ent.Y == y);
         }
 
         public void OnTimedEvent(object source, ElapsedEventArgs e) {
@@ -105,10 +107,13 @@ namespace RAOServer.Game {
 
             Log.Game(string.Format("Player {0} joined to room {1}", player.Name, Id));
             ChatToRoom(string.Format("Player {0} joined to room", player.Name), ":");
+
             player.Hero = new Hero(this) {X = 3, Y = 5};
+            Entities.Add(player.Hero);
         }
 
         internal void DisconnectPlayer(Player player) {
+            Entities.Remove(player.Hero);
             _players.Remove(player);
             player.ConnectToLobby();
 

@@ -104,7 +104,9 @@
 
 	// RENDER FUNCTIONS
 	// ================
-	var canvas = document.getElementById("myCanvas").getContext("2d");
+	var canvas_el = document.getElementById("myCanvas")
+	var canvas = canvas_el.getContext("2d");
+	canvas.font = "14px Arial";
 	var width = 16;
 
 	var img_wall = new Image();
@@ -116,10 +118,12 @@
 	var img_player = new Image();
 	img_player.src = "images/player.png"
 
+	game = {"map": "", "players": ""};
+
 	chat = []
 	function handleMessage(data){
 		json = JSON.parse(data);
-		log(data);
+		// log(data);
 		if (json["code"] != 200 || json["type"] == "status") {
 			log(data);
 		}
@@ -140,32 +144,53 @@
 
 			if (jsonData["map"]){
 				map = jsonData["map"].split('\n');
-				for (i in map){
-					map_row = map[i];
-					for (j in map_row){
-						if (map_row[j] == "#"){
-							canvas.drawImage(img_wall, j*width, i*width);
-						}
-						else if (map_row[j] == "."){
-							canvas.drawImage(img_floor, j*width, i*width);
-						}
-					}
-				}
+				game["map"] = map;
 			}
 
 			if (jsonData["players"]){
 				players = jsonData["players"];
-				for (player in players){
-					hero = players[player]["Hero"];
-					canvas.drawImage(img_player, hero["X"] * width, hero["Y"] * width);
+				game["players"] = players;
 				}
-			};
+		}
+	}
+
+	function draw(){
+		canvas.clearRect(0, 0, canvas_el.width, canvas_el.height);
+
+		// Draw map
+		for (i in game["map"]){
+			map_row = game["map"][i];
+			for (j in map_row){
+				if (map_row[j] == "#"){
+					canvas.drawImage(img_wall, j*width, i*width);
+				}
+				else if (map_row[j] == "."){
+					canvas.drawImage(img_floor, j*width, i*width);
+				}
+			}
+		}
+
+		// Draw players and HP bar:
+		for (i in game["players"]){
+			hero = game["players"][i]["Hero"];
+			canvas.drawImage(img_player, hero["X"] * width, hero["Y"] * width);
+
+			// render simple GUI
+			bar_width = 100;
+			bar_height = 20;
+
+			canvas.fillStyle = "#000000";
+			canvas.fillRect(600-bar_width, (bar_height+4)*i, bar_width, bar_height);
+			canvas.fillStyle = "#FF0000";
+			canvas.fillRect(600-bar_width, ((bar_height+4)* i), bar_width * (hero["Health"]/hero["HealthMax"]), bar_height);
+			canvas.fillStyle = "#FFFFFF";
+			canvas.fillText(game["players"][i]["Name"], 600-bar_width, (bar_height+4)*i + bar_height/2);
 		}
 	}
 
 	// UPDATE FUNCTIONS
 	// ================
-	// setInterval(function(){ send(getRequest(["map", "players"])); console.log(ws.readyState) }, 333);
+	setInterval(function(){ draw(); }, 25);
 
 	$('body').on('keydown',function(e){
 		if (e.keyCode == 87) { send(getControl("control_up")) };
@@ -176,4 +201,3 @@
 	});
 
 })();
-
