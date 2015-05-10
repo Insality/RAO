@@ -107,7 +107,7 @@
 	var canvas_el = document.getElementById("myCanvas")
 	var canvas = canvas_el.getContext("2d");
 	canvas.font = "14px Arial";
-	var width = 16;
+	var width = 32;
 
 	var img_wall = new Image();
 	img_wall.src = "images/wall.png"
@@ -118,18 +118,23 @@
 	var img_player = new Image();
 	img_player.src = "images/player.png"
 
-	game = {"map": "", "players": ""};
+	game = {"map": "", "players": "", "player": ""};
+	myPlayer = {}
 
 	chat = []
 	function handleMessage(data){
 		json = JSON.parse(data);
+		jsonData = JSON.parse(json["data"].replace(/'/g, '"'));
 		// log(data);
 		if (json["code"] != 200 || json["type"] == "status") {
 			log(data);
 		}
+		if (json["type"] == "status") {
+			if (jsonData["player"]){
+				myPlayer = jsonData["player"];
+			}
+		}
 		if (json["type"] == "information") {
-			jsonData = JSON.parse(json["data"].replace(/'/g, '"'));
-
 			if (jsonData["tick"]){
 				el = $("#turn_counter");
 				el.text( parseInt(el.text()) + 1);
@@ -150,22 +155,32 @@
 			if (jsonData["players"]){
 				players = jsonData["players"];
 				game["players"] = players;
+
+				for (player in players){
+					if (players[player]["Name"] == myPlayer["Name"]){
+						myPlayer = players[player]
+					}
 				}
+			}
 		}
 	}
 
 	function draw(){
 		canvas.clearRect(0, 0, canvas_el.width, canvas_el.height);
 
+		if (myPlayer["Hero"]){
+			var offsetX = (myPlayer["Hero"]["X"] * width) - canvas_el.width/2;
+			var offsetY = (myPlayer["Hero"]["Y"] * width) - canvas_el.height/2;
+		}
 		// Draw map
 		for (i in game["map"]){
 			map_row = game["map"][i];
 			for (j in map_row){
 				if (map_row[j] == "#"){
-					canvas.drawImage(img_wall, j*width, i*width);
+					canvas.drawImage(img_wall, j*width - offsetX, i*width - offsetY);
 				}
 				else if (map_row[j] == "."){
-					canvas.drawImage(img_floor, j*width, i*width);
+					canvas.drawImage(img_floor, j*width - offsetX, i*width - offsetY);
 				}
 			}
 		}
@@ -173,18 +188,19 @@
 		// Draw players and HP bar:
 		for (i in game["players"]){
 			hero = game["players"][i]["Hero"];
-			canvas.drawImage(img_player, hero["X"] * width, hero["Y"] * width);
+			canvas.drawImage(img_player, hero["X"] * width - offsetX, hero["Y"] * width - offsetY);
 
 			// render simple GUI
 			bar_width = 100;
 			bar_height = 20;
+			c_width = canvas_el.width
 
 			canvas.fillStyle = "#000000";
-			canvas.fillRect(600-bar_width, (bar_height+4)*i, bar_width, bar_height);
+			canvas.fillRect(c_width-bar_width, (bar_height+4)*i, bar_width, bar_height);
 			canvas.fillStyle = "#FF0000";
-			canvas.fillRect(600-bar_width, ((bar_height+4)* i), bar_width * (hero["Health"]/hero["HealthMax"]), bar_height);
+			canvas.fillRect(c_width-bar_width, ((bar_height+4)* i), bar_width * (hero["Health"]/hero["HealthMax"]), bar_height);
 			canvas.fillStyle = "#FFFFFF";
-			canvas.fillText(game["players"][i]["Name"], 600-bar_width, (bar_height+4)*i + bar_height/2);
+			canvas.fillText(game["players"][i]["Name"], c_width-bar_width, (bar_height+4)*i + bar_height/2);
 		}
 	}
 

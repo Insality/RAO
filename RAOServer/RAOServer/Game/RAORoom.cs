@@ -20,12 +20,14 @@ namespace RAOServer.Game {
         private readonly Timer timer;
         public int Id;
         public int MaxPlayers;
+        public int Turn;
         public RoomStates State;
 
         public List<Entity> Entities; 
 
         public RAORoom(int maxPlayers, int turnTime) {
             Id = _roomCounter++;
+            Turn = 0;
             State = RoomStates.RoomWaiting;
             MaxPlayers = maxPlayers;
             _players = new List<Player>();
@@ -78,6 +80,7 @@ namespace RAOServer.Game {
             foreach (var player in players){
                 player.Hero.Action();
             }
+
             // Send to all players game step info:
             var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerInformation};
 
@@ -90,6 +93,8 @@ namespace RAOServer.Game {
             foreach (var pl in _players){
                 pl.Connection.SendData(sm.Serialize());
             }
+
+            Turn++;
         }
 
         public JToken GetPlayersInfo() {
