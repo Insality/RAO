@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Timers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -104,7 +105,7 @@ namespace RAOServer.Game {
             player.ConnectToRoom(Id);
 
             Log.Game(string.Format("Player {0} joined to room {1}", player.Name, Id));
-
+            ChatToRoom(string.Format("Player {0} joined to room", player.Name), ":");
             player.Hero = new Hero(this) {X = 3, Y = 5};
         }
 
@@ -113,6 +114,22 @@ namespace RAOServer.Game {
             player.ConnectToLobby();
 
             Log.Game(string.Format("Player {0} leave room {1}", player.Name, Id));
+            ChatToRoom(string.Format("Player {0} leave room", player.Name), ":");
+        }
+
+        internal void ChatToRoom(string msg, string sender) {
+            var location = "Room#" + Id;
+
+            msg = string.Format("[{0}] {1}: {2}", location, sender, msg);
+            Log.Game(msg);
+
+            var sm = new ServerMessage {Code = MsgDict.CodeSuccessful, Type = MsgDict.ServerInformation};
+            var data = new JObject {{"chat", msg}};
+            sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
+
+            foreach (var pl in _players){
+                pl.Connection.SendData(sm.Serialize());
+            }
         }
     }
 }

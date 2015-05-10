@@ -310,27 +310,24 @@ namespace RAOServer {
                 throw new InvalidDataValues();
             }
 
-            var location = "Lobby";
             if (connection.Player.State == PlayerStates.PlayerGame){
-                location = "Room#" + connection.Player.CurrentRoom.Id;
-            }
-            var msg = jsonData["message"].ToString();
-            msg = string.Format("[{0}] {1}: {2}", location, connection.Player.Name, msg);
-            Log.Game(msg);
-
-            var sm = new ServerMessage {Code = MsgDict.CodeSuccessful, Type = MsgDict.ServerInformation};
-            var data = new JObject {{"chat", msg}};
-            sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
-
-            if (connection.Player.State == PlayerStates.PlayerLobby){
-                foreach (var pl in _allPlayers.Where(pl=>pl.State == PlayerStates.PlayerLobby)){
-                    pl.Connection.SendData(sm.Serialize());
-                }
+                connection.Player.CurrentRoom.ChatToRoom(jsonData["message"].ToString(), connection.Player.Name);
             }
             else{
-                foreach (var pl in connection.Player.CurrentRoom.GetPlayers()){
+                ChatToLobby(jsonData["message"].ToString(), connection.Player.Name);
+            }
+        }
+
+        public void ChatToLobby(string msg, string sender) {
+            msg = string.Format("[Lobby] {0}: {1}", sender, msg);
+            Log.Game(msg);
+
+            var sm = new ServerMessage { Code = MsgDict.CodeSuccessful, Type = MsgDict.ServerInformation };
+            var data = new JObject { { "chat", msg } };
+            sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
+
+            foreach (var pl in _allPlayers.Where(pl=>pl.State == PlayerStates.PlayerLobby)){
                     pl.Connection.SendData(sm.Serialize());
-                }
             }
         }
 
