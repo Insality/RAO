@@ -48,14 +48,14 @@ namespace RAOServer {
             _serverConsole = new Thread(ServerConsoleHandler);
             _serverConsole.Start();
 
-            CreateNewRoom();
+            CreateNewRoom(4, 250);
 
             _serverConsole.Join();
             _serverConnections.Join();
         }
 
-        public int CreateNewRoom() {
-            var newRoom = new RAORoom(this);
+        public int CreateNewRoom(int maxPlayers, int turnTime) {
+            var newRoom = new RAORoom(maxPlayers, turnTime);
             _serverRooms.Add(newRoom);
             Log.Debug("Creating new room");
             return newRoom.Id;
@@ -311,7 +311,7 @@ namespace RAOServer {
                 throw new InvalidDataValues();
             }
 
-            connection.Player.Hero.Action(jsonData["action"].ToString());
+            connection.Player.Hero.ActionQueue(jsonData["action"].ToString());
 
             var data = new JObject {{"requests", JToken.FromObject(new List<String> {"map", "players"})}};
 

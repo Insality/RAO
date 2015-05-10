@@ -19,18 +19,19 @@ namespace RAOServer.Game {
         private readonly List<Player.Player> _players;
         private readonly Timer timer;
         public int Id;
-        public int MaxPlayers = 4;
+        public int MaxPlayers;
         public string State;
         private RAOServer _server;
 
-        public RAORoom(RAOServer server) {
+        public RAORoom(int maxPlayers, int turnTime) {
             Id = _roomCounter++;
             State = States.RoomWaiting;
+            MaxPlayers = maxPlayers;
             _players = new List<Player.Player>();
-            _server = server;
+            _server = RAOServer.Instance;
             _map.LoadMapFromFile("testMap.txt");
 
-            timer = new Timer(250);
+            timer = new Timer(turnTime);
             timer.Elapsed += OnTimedEvent;
             timer.Start();
             GC.KeepAlive(timer);
@@ -70,6 +71,12 @@ namespace RAOServer.Game {
         }
 
         public void GameTick() {
+            // Do all player actions:
+            var players = _players.OrderBy(pl => pl.Hero.Initiative.Current).ToList();
+            foreach (var player in players){
+                player.Hero.Action();
+                Log.Game("Players turn " + player.Name + ":" + player.Id);
+            }
             // Send to all players game step info:
             var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerInformation};
 

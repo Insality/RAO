@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System;
+using Newtonsoft.Json.Linq;
 using RAOServer.Game.Mechanics;
 
 namespace RAOServer.Game.Player {
@@ -7,8 +8,10 @@ namespace RAOServer.Game.Player {
         public Stat Damage;
         public Stat Endurance;
         public Stat Health;
+        public Stat Initiative;
         public int Level;
         public char Sym;
+        private string _lastAction;
 
         public int X;
         public int Y;
@@ -17,14 +20,19 @@ namespace RAOServer.Game.Player {
             Damage = new Stat(10);
             Endurance = new Stat(50);
             Health = new Stat(100);
+            Initiative = new Stat(new Random().Next(1, 20));
             _room = room;
 
             Level = 1;
             Sym = '@';
         }
 
-        public void Action(string action) {
-            switch (action){
+        public void ActionQueue(string action) {
+            _lastAction = action;
+        }
+
+        public void Action() {
+            switch (_lastAction){
                 case "control_up":
                     if (!_room.GetTiles()[Y - 1][X].IsSolid){
                         Y--;
@@ -46,6 +54,7 @@ namespace RAOServer.Game.Player {
                     }
                     break;
             }
+            _lastAction = "";
         }
 
         public JToken GetInfo() {
@@ -54,6 +63,7 @@ namespace RAOServer.Game.Player {
                 {"Health", Health.Current},
                 {"Level", Level},
                 {"Sym", Sym},
+                {"Initiative", Initiative.Current},
                 {"X", X},
                 {"Y", Y}
             };

@@ -78,9 +78,8 @@ namespace RAOServer {
         }
 
         private void _commandNewRoom() {
-            var newRoom = new RAORoom(_server);
-            Log.Network("New room: " + newRoom.Id);
-            _server.GetRooms().Add(newRoom);
+            var roomId = _server.CreateNewRoom(4, 250);
+            Log.Network("New room: " + roomId);
         }
 
         private void _commandRemoveRoom(string arg) {
@@ -92,16 +91,7 @@ namespace RAOServer {
         }
 
         private void _commandStatus() {
-            Log.Terminal(_ws.KeepClean.ToString());
-            Log.Terminal(_ws.WebSocketServices[Settings.GameRoute].Type.ToString());
-            Log.Terminal(string.Join(", ", _ws.WebSocketServices[Settings.GameRoute].Sessions.ActiveIDs));
-            Log.Terminal("INACTIVES");
-            Log.Terminal(string.Join(", ", _ws.WebSocketServices[Settings.GameRoute].Sessions.InactiveIDs));
-            Log.Terminal(string.Join(", ", _ws.WebSocketServices[Settings.GameRoute].Sessions.Sessions));
-
-            foreach (RAOConnection ses in _ws.WebSocketServices[Settings.GameRoute].Sessions.Sessions){
-                Log.Terminal(string.Format("{0}: {1}, {2}", ses.Player.Name, ses.ID, ses.State));
-            }
+            Log.Terminal("NON INMPLEMENTED");
         }
 
         private void _commandExit() {

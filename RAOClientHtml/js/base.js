@@ -107,6 +107,9 @@
 
 	function handleMessage(data){
 		json = JSON.parse(data);
+		if (json["code"] != 200 || json["type"] == "status") {
+			log(data);
+		}
 		if (json["type"] == "information") {
 			jsonData = JSON.parse(json["data"].replace(/'/g, '"'));
 			if (jsonData["tick"]){
