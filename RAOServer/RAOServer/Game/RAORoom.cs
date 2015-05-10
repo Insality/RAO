@@ -17,12 +17,11 @@ namespace RAOServer.Game {
         private static int _roomCounter;
         private readonly Map _map = new Map();
         private readonly List<Player.Player> _players;
+        private readonly Timer timer;
         public int Id;
         public int MaxPlayers = 4;
         public string State;
         private RAOServer _server;
-
-        private Timer timer;
 
         public RAORoom(RAOServer server) {
             Id = _roomCounter++;
@@ -72,7 +71,7 @@ namespace RAOServer.Game {
 
         public void GameTick() {
             // Send to all players game step info:
-            var sm = new ServerMessage { Code = 200, Type = MsgDict.ServerInformation };
+            var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerInformation};
 
             var data = new JObject();
             data.Add("map", GetStringMap());

@@ -102,7 +102,6 @@ namespace RAOServer {
             foreach (RAOConnection ses in _ws.WebSocketServices[Settings.GameRoute].Sessions.Sessions){
                 Log.Terminal(string.Format("{0}: {1}, {2}", ses.Player.Name, ses.ID, ses.State));
             }
-            
         }
 
         private void _commandExit() {

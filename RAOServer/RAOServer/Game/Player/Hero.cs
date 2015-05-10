@@ -3,12 +3,12 @@ using RAOServer.Game.Mechanics;
 
 namespace RAOServer.Game.Player {
     internal class Hero {
+        private readonly RAORoom _room;
         public Stat Damage;
         public Stat Endurance;
         public Stat Health;
         public int Level;
         public char Sym;
-        private RAORoom _room;
 
         public int X;
         public int Y;
@@ -26,22 +26,22 @@ namespace RAOServer.Game.Player {
         public void Action(string action) {
             switch (action){
                 case "control_up":
-                    if (!_room.GetTiles()[Y-1][X].IsSolid){
+                    if (!_room.GetTiles()[Y - 1][X].IsSolid){
                         Y--;
                     }
                     break;
                 case "control_down":
-                    if (!_room.GetTiles()[Y + 1][X].IsSolid) {
+                    if (!_room.GetTiles()[Y + 1][X].IsSolid){
                         Y++;
                     }
                     break;
                 case "control_left":
-                    if (!_room.GetTiles()[Y][X-1].IsSolid) {
+                    if (!_room.GetTiles()[Y][X - 1].IsSolid){
                         X--;
                     }
                     break;
                 case "control_right":
-                    if (!_room.GetTiles()[Y][X+1].IsSolid) {
+                    if (!_room.GetTiles()[Y][X + 1].IsSolid){
                         X++;
                     }
                     break;

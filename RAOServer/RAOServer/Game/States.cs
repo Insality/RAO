@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Eventing.Reader;
-
-namespace RAOServer.Game {
+﻿namespace RAOServer.Game {
     internal class States {
         public const string RoomWaiting = "room.waiting";
         public const string RoomPlaying = "room.playing";

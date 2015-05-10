@@ -31,7 +31,14 @@ namespace RAOServer.Network {
 
         public static readonly List<string> ClientRequestKeys = new List<string> {"type", "api", "data"};
         public static readonly List<string> ClientConnectKeys = new List<string> {"login", "password"};
-        public static readonly List<string> ClientControlCommands = new List<string> { "control_up", "control_down", "control_left", "control_right", "control_action" };
+
+        public static readonly List<string> ClientControlCommands = new List<string> {
+            "control_up",
+            "control_down",
+            "control_left",
+            "control_right",
+            "control_action"
+        };
 
         public static readonly List<string> ClientTypeValues = new List<string> {
             ClientConnect,

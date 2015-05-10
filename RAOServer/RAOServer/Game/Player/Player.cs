@@ -3,6 +3,8 @@ using RAOServer.Network;
 
 namespace RAOServer.Game.Player {
     internal class Player {
+        private readonly RAOServer _server;
+        public RAOConnection Connection;
         public RAORoom CurrentRoom;
         public Hero Hero;
         public string Id;
@@ -10,9 +12,6 @@ namespace RAOServer.Game.Player {
         public string Name;
         public PlayerStates State;
         public PlayerStatistic Statistic;
-        public RAOConnection Connection;
-
-        private readonly RAOServer _server;
 
 
         public Player(string id, string name, RAOConnection connection) {
@@ -34,7 +33,12 @@ namespace RAOServer.Game.Player {
             if (CurrentRoom != null){
                 curRoomIndex = CurrentRoom.Id;
             }
-            var info = new JObject {{"Name", Name}, {"Hero", Hero.GetInfo()}, {"CurrentRoom",  curRoomIndex}, {"State", State.ToString()}};
+            var info = new JObject {
+                {"Name", Name},
+                {"Hero", Hero.GetInfo()},
+                {"CurrentRoom", curRoomIndex},
+                {"State", State.ToString()}
+            };
             return info;
         }
 
@@ -48,7 +52,7 @@ namespace RAOServer.Game.Player {
         }
 
         public void ConnectToLobby() {
-            if (State != PlayerStates.PlayerGame) {
+            if (State != PlayerStates.PlayerGame){
                 throw new PlayerNotInGame();
             }
 

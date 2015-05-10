@@ -5,8 +5,8 @@ using RAOServer.Utils;
 
 namespace RAOServer.Game {
     internal class Map {
-        public List<List<Tile>> Tiles;
         public string Name;
+        public List<List<Tile>> Tiles;
 
         public Map() {
             Name = "Unnamed dungeon";

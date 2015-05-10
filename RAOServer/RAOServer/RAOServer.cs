@@ -216,7 +216,8 @@ namespace RAOServer {
         private void _handleDisconnect(RAOConnection connection, JToken jsonData) {
             if (connection.Player.CurrentRoom != null){
                 connection.Player.CurrentRoom.DisconnectPlayer(connection.Player);
-            } else if (connection.Player != null){
+            }
+            else if (connection.Player != null){
                 RemovePlayer(connection.ID);
                 connection.CloseConnection("Disconnect by user");
             }
@@ -277,7 +278,7 @@ namespace RAOServer {
         private void _handleStatus(RAOConnection connection, JToken jsonData) {
             var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerStatus};
 
-            if (jsonData["requests"] == null) {
+            if (jsonData["requests"] == null){
                 throw new InvalidDataFormat();
             }
 
@@ -285,8 +286,8 @@ namespace RAOServer {
             var requests = jsonData["requests"];
 
             // Lobby && Any requests:
-            if (requests.ToList().Contains("roomlist")) {
-                var roomlist = GetRooms().Select(room => room.GetInfo()).ToList();
+            if (requests.ToList().Contains("roomlist")){
+                var roomlist = GetRooms().Select(room=>room.GetInfo()).ToList();
                 data.Add("roomlist", JToken.FromObject(roomlist));
             }
 
