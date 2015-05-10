@@ -18,20 +18,18 @@ namespace RAOServer {
 
         private readonly List<Player> _allPlayers;
         private readonly List<RAORoom> _serverRooms;
-        private bool _isRunning;
         private Thread _serverConnections;
         private Thread _serverConsole;
         private WebSocketServer _webSocketServer;
 
         private RAOServer() {
             // Init all lists
-            _isRunning = false;
             _serverRooms = new List<RAORoom>();
             _allPlayers = new List<Player>();
 
             var timer = new Timer(5000);
             timer.Elapsed += OnTimedEvent;
-            timer.Enabled = true;
+            timer.Start();
             GC.KeepAlive(timer);
         }
 
@@ -43,8 +41,6 @@ namespace RAOServer {
             // Init all services
             _webSocketServer = new WebSocketServer(Settings.Port);
             _webSocketServer.AddWebSocketService<RAOConnection>(Settings.GameRoute);
-            //            _webSocketServer.Log.Level = LogLevel.Trace;
-
 
             _serverConnections = new Thread(ServerConnectionsHandler);
             _serverConnections.Start();
@@ -82,11 +78,10 @@ namespace RAOServer {
         }
 
         public RAORoom GetRoom(int index) {
-            if (index == -1){
-                throw new PlayerNotInGame();
-            }
-
             var room = _serverRooms.Find(rm=>rm.Id == index);
+            if (room == null){
+                throw new InvalidDataValues();
+            }
             return room;
         }
 
@@ -104,11 +99,6 @@ namespace RAOServer {
 
             // For the information about this: https://github.com/sta/websocket-sharp           
             _webSocketServer.Start();
-            _isRunning = true;
-
-
-            //            Log.Info("Server stop");
-            //            _webSocketServer.Stop();
         }
 
         public void CheckPlayersOnline() {
@@ -120,8 +110,8 @@ namespace RAOServer {
             }
         }
 
-        public Player RegisterPlayer(string id, string login) {
-            var pl = new Player(id, login);
+        public Player RegisterPlayer(string id, string login, RAOConnection connection) {
+            var pl = new Player(id, login, connection);
             _allPlayers.Add(pl);
 
             Log.Game(string.Format("Player {0} joined to the game", pl.Name));
@@ -132,7 +122,7 @@ namespace RAOServer {
         public void RemovePlayer(string id) {
             var pl = _allPlayers.Find(player=>player.Id == id);
             _allPlayers.Remove(pl);
-            GetRoom(pl.CurrentRoom).DisconnectPlayer(pl);
+            pl.CurrentRoom.DisconnectPlayer(pl);
 
             Log.Game(string.Format("Player {0} has disconnected", pl.Name));
         }
@@ -169,22 +159,22 @@ namespace RAOServer {
 
                 switch (json["type"].ToString()){
                     case MsgDict.ClientConnect:
-                        _handleConnect(connection, json, jsonData);
+                        _handleConnect(connection, jsonData);
                         break;
                     case MsgDict.ClientConnectRoom:
-                        _handleConnectRoom(connection, json, jsonData);
+                        _handleConnectRoom(connection, jsonData);
                         break;
                     case MsgDict.ClientStatus:
-                        _handleStatus(connection, json, jsonData);
+                        _handleStatus(connection, jsonData);
                         break;
                     case MsgDict.ClientRequest:
-                        _handleRequest(connection, json, jsonData);
+                        _handleRequest(connection, jsonData);
                         break;
                     case MsgDict.ClientDisconnect:
-                        _handleDisconnect(connection, json, jsonData);
+                        _handleDisconnect(connection, jsonData);
                         break;
                     case MsgDict.ClientControl:
-                        _handleControl(connection, json, jsonData);
+                        _handleControl(connection, jsonData);
                         break;
                 }
             }
@@ -202,7 +192,7 @@ namespace RAOServer {
         }
 
 
-        private void _handleConnect(RAOConnection connection, JToken json, JToken jsonData) {
+        private void _handleConnect(RAOConnection connection, JToken jsonData) {
             if (connection.Player != null){
                 throw new AlreadyLogged();
             }
@@ -214,7 +204,7 @@ namespace RAOServer {
             var password = jsonData["password"].ToString();
 
             if (login == "" && password == ""){
-                var player = RegisterPlayer(connection.ID, "InsalityTEST");
+                var player = RegisterPlayer(connection.ID, "InsalityTEST", connection);
                 connection.Player = player;
                 connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeSuccessful));
             }
@@ -223,17 +213,20 @@ namespace RAOServer {
             }
         }
 
-        private void _handleDisconnect(RAOConnection connection, JToken json, JToken jsonData) {
-            if (connection.Player != null)
+        private void _handleDisconnect(RAOConnection connection, JToken jsonData) {
+            if (connection.Player.CurrentRoom != null){
+                connection.Player.CurrentRoom.DisconnectPlayer(connection.Player);
+            } else if (connection.Player != null){
                 RemovePlayer(connection.ID);
-            connection.CloseConnection("Disconnect by user");
+                connection.CloseConnection("Disconnect by user");
+            }
         }
 
-        private void _handleConnectRoom(RAOConnection connection, JToken json, JToken jsonData) {
+        private void _handleConnectRoom(RAOConnection connection, JToken jsonData) {
             if (jsonData["index"] == null){
                 throw new InvalidDataFormat();
             }
-            if (connection.Player.CurrentRoom != -1){
+            if (connection.Player.CurrentRoom != null){
                 throw new PlayerNotInLobby();
             }
 
@@ -255,7 +248,10 @@ namespace RAOServer {
             }
         }
 
-        private void _handleRequest(RAOConnection connection, JToken json, JToken jsonData) {
+        private void _handleRequest(RAOConnection connection, JToken jsonData) {
+            if (connection.Player.State != PlayerStates.PlayerGame){
+                throw new PlayerNotInGame();
+            }
             if (jsonData["requests"] == null){
                 throw new InvalidDataFormat();
             }
@@ -265,34 +261,47 @@ namespace RAOServer {
             var data = new JObject();
             var requests = jsonData["requests"];
 
-            if (requests.ToList().Contains("roomlist")){
-                var roomlist = GetRooms().Select(room=>room.GetInfo()).ToList();
-                data.Add("roomlist", JToken.FromObject(roomlist));
-            }
-
+            // Game Requests:
             if (requests.ToList().Contains("map")){
-                data.Add("map", GetRoom(connection.Player.CurrentRoom).GetStringMap());
+                data.Add("map", connection.Player.CurrentRoom.GetStringMap());
             }
 
             if (requests.ToList().Contains("players")){
-                data.Add("players", GetRoom(connection.Player.CurrentRoom).GetPlayersInfo());
+                data.Add("players", connection.Player.CurrentRoom.GetPlayersInfo());
             }
 
             sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
             connection.SendData(sm.Serialize());
         }
 
-        private void _handleStatus(RAOConnection connection, JToken json, JToken jsonData) {
+        private void _handleStatus(RAOConnection connection, JToken jsonData) {
             var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerStatus};
 
+            if (jsonData["requests"] == null) {
+                throw new InvalidDataFormat();
+            }
+
             var data = new JObject();
-            data.Add("player", connection.Player.GetInfo());
+            var requests = jsonData["requests"];
+
+            // Lobby && Any requests:
+            if (requests.ToList().Contains("roomlist")) {
+                var roomlist = GetRooms().Select(room => room.GetInfo()).ToList();
+                data.Add("roomlist", JToken.FromObject(roomlist));
+            }
+
+            if (requests.ToList().Contains("player")){
+                data.Add("player", connection.Player.GetInfo());
+            }
 
             sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
             connection.SendData(sm.Serialize());
         }
 
-        private void _handleControl(RAOConnection connection, JToken json, JToken jsonData) {
+        private void _handleControl(RAOConnection connection, JToken jsonData) {
+            if (connection.Player.State != PlayerStates.PlayerGame){
+                throw new PlayerNotInGame();
+            }
             if (jsonData["action"] == null){
                 throw new InvalidDataFormat();
             }
@@ -305,7 +314,7 @@ namespace RAOServer {
 
             var data = new JObject {{"requests", JToken.FromObject(new List<String> {"map", "players"})}};
 
-            _handleRequest(connection, json, data);
+            _handleRequest(connection, data);
             connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeSuccessful));
         }
 

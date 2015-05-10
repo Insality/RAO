@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Timers;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RAOServer.Game.Player;
 using RAOServer.Network;
@@ -20,18 +22,19 @@ namespace RAOServer.Game {
         public string State;
         private RAOServer _server;
 
+        private Timer timer;
+
         public RAORoom(RAOServer server) {
             Id = _roomCounter++;
             State = States.RoomWaiting;
             _players = new List<Player.Player>();
             _server = server;
             _map.LoadMapFromFile("testMap.txt");
-        }
 
-        public void PrintMap() {
-            foreach (var tile in _map.Tiles){
-                Log.Debug(String.Join("", tile));
-            }
+            timer = new Timer(250);
+            timer.Elapsed += OnTimedEvent;
+            timer.Start();
+            GC.KeepAlive(timer);
         }
 
         public List<List<Tile>> GetTiles() {
@@ -40,6 +43,10 @@ namespace RAOServer.Game {
 
         public int GetPlayersCount() {
             return _players.Count;
+        }
+
+        public void OnTimedEvent(object source, ElapsedEventArgs e) {
+            GameTick();
         }
 
         public string GetStringMap() {
@@ -56,9 +63,26 @@ namespace RAOServer.Game {
                 {"Id", Id},
                 {"Players", GetPlayersCount()},
                 {"MaxPlayers", MaxPlayers},
-                {"State", State}
+                {"State", State},
+                {"Map", _map.GetInfo()},
+                {"TurnTime", timer.Interval}
             };
             return info;
+        }
+
+        public void GameTick() {
+            // Send to all players game step info:
+            var sm = new ServerMessage { Code = 200, Type = MsgDict.ServerInformation };
+
+            var data = new JObject();
+            data.Add("map", GetStringMap());
+            data.Add("players", GetPlayersInfo());
+            data.Add("tick", true);
+            sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
+
+            foreach (var pl in _players){
+                pl.Connection.SendData(sm.Serialize());
+            }
         }
 
         public JToken GetPlayersInfo() {

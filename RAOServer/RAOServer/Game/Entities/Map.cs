@@ -1,10 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json.Linq;
 using RAOServer.Utils;
 
 namespace RAOServer.Game {
     internal class Map {
         public List<List<Tile>> Tiles;
+        public string Name;
+
+        public Map() {
+            Name = "Unnamed dungeon";
+        }
 
         public void LoadMapFromFile(string filename) {
             Tiles = new List<List<Tile>>();
@@ -36,6 +42,14 @@ namespace RAOServer.Game {
                 }
                 Tiles.Add(tilesRow);
             }
+        }
+
+        public JObject GetInfo() {
+            var info = new JObject {
+                {"Name", Name},
+                {"Size", Tiles.Count},
+            };
+            return info;
         }
     }
 }
