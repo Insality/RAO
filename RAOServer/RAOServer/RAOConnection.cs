@@ -1,5 +1,4 @@
 ﻿using RAOServer.Game.Player;
-using RAOServer.Utils;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
@@ -22,12 +21,25 @@ namespace RAOServer {
         }
 
         protected override void OnMessage(MessageEventArgs e) {
+            base.OnMessage(e);
             _server.HandleMessage(e.Data, this);
         }
 
         protected override void OnOpen() {
-            Log.Network("Client connected from " + Context.UserEndPoint);
+            base.OnOpen();
+            Utils.Log.Network("Client connected from " + Context.UserEndPoint);
             SessionId = ID;
+        }
+
+        protected override void OnClose(CloseEventArgs e) {
+            base.OnClose(e);
+            Utils.Log.Error("CLOSE ID: " + ID);
+            _server.RemovePlayer(ID);
+        }
+
+        protected override void OnError(ErrorEventArgs e) {
+            base.OnError(e);
+            Utils.Log.Error("ERROR IN ID: " + ID);
         }
     }
 }

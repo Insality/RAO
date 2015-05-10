@@ -18,12 +18,14 @@ namespace RAOServer {
 
         private readonly List<Player> _allPlayers;
         private readonly List<RAORoom> _serverRooms;
+        private bool _isRunning;
         private Thread _serverConnections;
         private Thread _serverConsole;
         private WebSocketServer _webSocketServer;
 
         private RAOServer() {
             // Init all lists
+            _isRunning = false;
             _serverRooms = new List<RAORoom>();
             _allPlayers = new List<Player>();
 
@@ -39,8 +41,10 @@ namespace RAOServer {
 
         public void Start() {
             // Init all services
-            _webSocketServer = new WebSocketServer(string.Format("ws://{0}:{1}", Settings.Ip, Settings.Port));
+            _webSocketServer = new WebSocketServer(Settings.Port);
             _webSocketServer.AddWebSocketService<RAOConnection>(Settings.GameRoute);
+            //            _webSocketServer.Log.Level = LogLevel.Trace;
+
 
             _serverConnections = new Thread(ServerConnectionsHandler);
             _serverConnections.Start();
@@ -49,11 +53,15 @@ namespace RAOServer {
             _serverConsole.Start();
 
             CreateNewRoom();
+
+            _serverConsole.Join();
+            _serverConnections.Join();
         }
 
         public int CreateNewRoom() {
             var newRoom = new RAORoom(this);
             _serverRooms.Add(newRoom);
+            Log.Debug("Creating new room");
             return newRoom.Id;
         }
 
@@ -96,18 +104,17 @@ namespace RAOServer {
 
             // For the information about this: https://github.com/sta/websocket-sharp           
             _webSocketServer.Start();
+            _isRunning = true;
 
-            _webSocketServer.KeepClean = false;
-            _webSocketServer.ReuseAddress = true;
-            Log.Debug(_webSocketServer.WaitTime.ToString());
-//            Log.Debug(_webSocketServer.WebSocketServices[Settings.GameRoute].KeepClean.ToString());
-            _webSocketServer.WebSocketServices[Settings.GameRoute].KeepClean = false;
-//            Log.Debug(_webSocketServer.WebSocketServices[Settings.GameRoute].WaitTime.ToString());
+
+            //            Log.Info("Server stop");
+            //            _webSocketServer.Stop();
         }
 
         public void CheckPlayersOnline() {
+            var ids = _webSocketServer.WebSocketServices[Settings.GameRoute].Sessions.IDs;
             foreach (var player in _allPlayers.ToList()){
-                if (!_webSocketServer.WebSocketServices[Settings.GameRoute].Sessions.IDs.Contains(player.Id)){
+                if (!ids.Contains(player.Id)){
                     RemovePlayer(player.Id);
                 }
             }
@@ -136,6 +143,7 @@ namespace RAOServer {
         ///     перенаправляет их в нужные места
         /// </summary>
         public void HandleMessage(string data, RAOConnection connection) {
+            Log.Debug("Recieved: " + data);
             try{
                 var json = JToken.Parse(data);
 
@@ -158,11 +166,6 @@ namespace RAOServer {
                 }
 
                 var jsonData = JToken.Parse(json["data"].ToString());
-
-//                if (connection.Player == null)
-//                    Log.Debug(string.Format("{2} Msg from {0}: {1}", connection.ID, json["data"], json["type"]));
-//                else
-//                    Log.Debug(string.Format("{2} Msg from {0}: {1}", connection.Player.Name, json["data"], json["type"]));
 
                 switch (json["type"].ToString()){
                     case MsgDict.ClientConnect:
@@ -239,7 +242,7 @@ namespace RAOServer {
             try{
                 rm = _serverRooms.Find(room=>room.Id == int.Parse(roomIndex.ToString()));
             }
-            catch (FormatException ex){
+            catch (FormatException){
                 throw new InvalidDataValues();
             }
 
@@ -267,11 +270,11 @@ namespace RAOServer {
                 data.Add("roomlist", JToken.FromObject(roomlist));
             }
 
-            if (requests.ToList().Contains("map")) {
+            if (requests.ToList().Contains("map")){
                 data.Add("map", GetRoom(connection.Player.CurrentRoom).GetStringMap());
             }
 
-            if (requests.ToList().Contains("players")) {
+            if (requests.ToList().Contains("players")){
                 data.Add("players", GetRoom(connection.Player.CurrentRoom).GetPlayersInfo());
             }
 
@@ -290,7 +293,7 @@ namespace RAOServer {
         }
 
         private void _handleControl(RAOConnection connection, JToken json, JToken jsonData) {
-            if (jsonData["action"] == null) {
+            if (jsonData["action"] == null){
                 throw new InvalidDataFormat();
             }
 
@@ -300,7 +303,9 @@ namespace RAOServer {
 
             connection.Player.Hero.Action(jsonData["action"].ToString());
 
-//            connection.SendData();
+            var data = new JObject {{"requests", JToken.FromObject(new List<String> {"map", "players"})}};
+
+            _handleRequest(connection, json, data);
             connection.SendData(ServerMessage.ResponseCode(MsgDict.CodeSuccessful));
         }
 

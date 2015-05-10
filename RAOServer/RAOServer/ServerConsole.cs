@@ -51,6 +51,9 @@ namespace RAOServer {
                 case "help":
                     _commandHelp();
                     return;
+                case "status":
+                    _commandStatus();
+                    return;
                 case "exit":
                     _commandExit();
                     return;
@@ -86,6 +89,20 @@ namespace RAOServer {
 
         private void _commandHelp() {
             Log.Terminal(String.Join("\n", _commandsList));
+        }
+
+        private void _commandStatus() {
+            Log.Terminal(_ws.KeepClean.ToString());
+            Log.Terminal(_ws.WebSocketServices[Settings.GameRoute].Type.ToString());
+            Log.Terminal(string.Join(", ", _ws.WebSocketServices[Settings.GameRoute].Sessions.ActiveIDs));
+            Log.Terminal("INACTIVES");
+            Log.Terminal(string.Join(", ", _ws.WebSocketServices[Settings.GameRoute].Sessions.InactiveIDs));
+            Log.Terminal(string.Join(", ", _ws.WebSocketServices[Settings.GameRoute].Sessions.Sessions));
+
+            foreach (RAOConnection ses in _ws.WebSocketServices[Settings.GameRoute].Sessions.Sessions){
+                Log.Terminal(string.Format("{0}: {1}, {2}", ses.Player.Name, ses.ID, ses.State));
+            }
+            
         }
 
         private void _commandExit() {

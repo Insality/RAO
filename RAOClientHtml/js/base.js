@@ -8,13 +8,13 @@
 	// REQUESTS BUILDER
 	// ================
 	function getRequestForm(){
-		return {"type": "", "api": "1.0", "data": {}}
+		return {"type": "", "api": "1.0", "data": {}};
 	}
 
 	function getDisconnect(){
 		a = getRequestForm();
 		a["type"] = "disconnect";
-		return a
+		return a;
 	}
 
 	function getConnect(){
@@ -56,7 +56,7 @@
 
 	// CONNECTIONS SETTINGS
 	// ====================
-	URL = "ws://127.0.0.1:4080/rao"
+	URL = "ws://localhost:4080/rao"
 	ws = new WebSocket(URL);
 	ws.onopen = function(){ 
 		log("Connection opened to "+ URL);
@@ -66,18 +66,18 @@
 	ws.onerror = function(error){ log("Got error: " + error.message); };
 
 	function send(json){
-		text = JSON.stringify(json)
-		log("Send: " + text)
+		text = JSON.stringify(json);
+		log("Send: " + text);
 		ws.send(text);
 	}
 
 	// BUTTONS FUNCTIONS
 	// =================
-	document.getElementById('connect').addEventListener('click', function(){ send(getConnect()) }, false);
-	document.getElementById('connect_room').addEventListener('click', function(){ send(getConnectRoom()) }, false);
-	document.getElementById('disconnect').addEventListener('click', function(){ send(getDisconnect()); }, false);
-	document.getElementById('request').addEventListener('click', function(){ send(getRequest(["map", "players"])); }, false);
 	document.getElementById('status').addEventListener('click', function(){ send(getStatus()) }, false);
+	document.getElementById('connect').addEventListener('click', function(){ send(getConnect()) }, false);
+	document.getElementById('request').addEventListener('click', function(){ send(getRequest(["map", "players"])); }, false);
+	document.getElementById('disconnect').addEventListener('click', function(){ send(getDisconnect()); }, false);
+	document.getElementById('connect_room').addEventListener('click', function(){ send(getConnectRoom()) }, false);
 
 
 	document.getElementById('control_up').addEventListener('click', function(){ send(getControl(this.id)) }, false);
@@ -104,7 +104,6 @@
 	function handleMessage(data){
 		json = JSON.parse(data);
 		if (json["type"] == "information") {
-			// console.log(json["data"]);
 			jsonData = JSON.parse(json["data"].replace(/'/g, '"'));
 			if (jsonData["map"]){
 				map = jsonData["map"].split('\n');
@@ -133,7 +132,7 @@
 
 	// UPDATE FUNCTIONS
 	// ================
-	setInterval(function(){ send(getRequest(["map", "players"])); console.log(ws.readyState) }, 333);
+	// setInterval(function(){ send(getRequest(["map", "players"])); console.log(ws.readyState) }, 333);
 
 	$('body').on('keydown',function(e){
 		if (e.keyCode == 87) { send(getControl("control_up")) };
