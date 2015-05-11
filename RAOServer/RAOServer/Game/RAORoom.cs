@@ -44,7 +44,7 @@ namespace RAOServer.Game {
             _map.LoadMapFromFile("testMap.txt");
         }
 
-        public List<List<Tile>> GetTiles() {
+        public List<Tile> GetTiles() {
             return _map.Tiles;
         }
 
@@ -56,13 +56,17 @@ namespace RAOServer.Game {
             GameTick();
         }
 
-        public string GetStringMap() {
-            var str = "";
-            foreach (var tileRow in _map.Tiles){
-                str += string.Join("", tileRow);
-                str += '\n';
+        public JToken GetMapInfo(Player pl) {
+            List<JObject> mapInfo;
+            if (pl == null){
+                mapInfo = _map.Tiles.Select(tile=>tile.GetInfo()).ToList();
             }
-            return str;
+            else{
+                var h = pl.Hero;
+                mapInfo = _map.Tiles.Where(t=> h.DistanceTo(t.X, t.Y) <= h.SeeRadius.Current)
+                    .Select(tile => tile.GetInfo()).ToList();
+            }
+            return Map.CompressMapList(mapInfo);
         }
 
         public JObject GetInfo() {
@@ -85,16 +89,18 @@ namespace RAOServer.Game {
             }
 
             // Send to all players game step info:
-            var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerInformation};
 
-            var data = new JObject();
-            data.Add("map", GetStringMap());
-            data.Add("players", GetPlayersInfo());
-            data.Add("entities", GetEntitiesInfo());
-            data.Add("tick", true);
-            sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
 
             foreach (var pl in _players){
+                var sm = new ServerMessage { Code = 200, Type = MsgDict.ServerInformation };
+
+                var data = new JObject();
+                data.Add("map", GetMapInfo(pl));
+                data.Add("players", GetPlayersInfo());
+                data.Add("entities", GetEntitiesInfo(pl));
+                data.Add("tick", true);
+                sm.Data = data.ToString(Formatting.None).Replace('"', '\'');
+
                 pl.Connection.SendData(sm.Serialize());
             }
 
@@ -106,8 +112,16 @@ namespace RAOServer.Game {
             return JToken.FromObject(playersInfo);
         }
 
-        public JToken GetEntitiesInfo() {
-            var entitiesInfo = Entities.Select(entitity => entitity.GetInfo()).ToList();
+        public JToken GetEntitiesInfo(Player pl) {
+            List<JObject> entitiesInfo;
+            if (pl == null){
+                entitiesInfo = Entities.Select(entitity=>entitity.GetInfo()).ToList();
+            }
+            else{
+                var h = pl.Hero;
+                entitiesInfo = Entities.Where(e => (Math.Sqrt(Math.Pow(h.X - e.X, 2) + Math.Pow(h.Y - e.Y, 2))) <= h.SeeRadius.Current)
+                    .Select(e => e.GetInfo()).ToList();
+            }
             return JToken.FromObject(entitiesInfo);
         }
 

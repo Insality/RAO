@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using RAOServer.Game.Entities.Enviroment;
@@ -7,8 +8,8 @@ using RAOServer.Utils;
 namespace RAOServer.Game {
     internal class Map {
         public string Name;
-        public List<List<Tile>> Tiles;
-        private RAORoom _room;
+        public List<Tile> Tiles;
+        private readonly RAORoom _room;
 
         public Map(RAORoom room) {
             Name = "Unnamed dungeon";
@@ -16,7 +17,7 @@ namespace RAOServer.Game {
         }
 
         public void LoadMapFromFile(string filename) {
-            Tiles = new List<List<Tile>>();
+            Tiles = new List<Tile>();
             var entities = _room.Entities;
 
             var s = File.ReadAllText(filename);
@@ -27,30 +28,35 @@ namespace RAOServer.Game {
             }
 
             for (var i = 0; i < tileMap.Count; i++){
-                var tilesRow = new List<Tile>();
                 for (var j = 0; j < tileMap[i].Length; j++){
                     Tile tile;
                     switch (tileMap[i][j]){
-                        case '#':
-                            tile = new Tile(tileMap[i][j]);
-                            break;
-                        case '.':
-                            tile = new Tile(tileMap[i][j]);
-                            break;
                         case '_':
-                            tile = new Tile(tileMap[i][j]);
                             entities.Add(new PressurePlate(j, i, _room));
                             break;
-                        default:
-                            tile = new Tile(tileMap[i][j]);
-                            Log.Error("Error tile ASCII code in LoadMapFromFile()");
-                            break;
                     }
-                    tilesRow.Add(tile);
+                    Tiles.Add(new Tile(j, i, tileMap[i][j]));
                 }
-                Tiles.Add(tilesRow);
             }
         }
+
+        public static JObject CompressMapList(List<JObject> tiles) {
+            var listWall = new List<List<int>>();
+            var listFloor = new List<List<int>>();
+
+            foreach (var tile in tiles){
+                if (tile["Sym"].ToString() == "#")
+                    listWall.Add(new List<int>{int.Parse(tile["X"].ToString()), int.Parse(tile["Y"].ToString())} );
+                if (tile["Sym"].ToString() == ".")
+                    listFloor.Add(new List<int>{int.Parse(tile["X"].ToString()), int.Parse(tile["Y"].ToString())} );
+            }
+
+            var info = new JObject {
+                {"#", JToken.FromObject(listWall)},
+                {".", JToken.FromObject(listFloor)},
+            };
+            return info;
+        } 
 
 
         public JObject GetInfo() {

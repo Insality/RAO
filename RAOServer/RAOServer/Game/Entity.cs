@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 using RAOServer.Game.Mechanics;
 
@@ -72,7 +73,7 @@ namespace RAOServer.Game {
         }
 
         public void MoveBy(int x, int y) {
-            if (Room.GetTiles()[Y + y][X + x].IsSolid) return;
+            if (Room.GetTiles().Find(t=>t.X == X + x && t.Y == Y + y).IsSolid) return;
             Y += y;
             X += x;
         }
@@ -95,6 +96,14 @@ namespace RAOServer.Game {
 
             if (!entities.Any())
                 MoveBy(x, y);
+        }
+
+        public double DistanceTo(Entity other) {
+            return DistanceTo(other.X, other.Y);
+        }
+
+        public double DistanceTo(int x, int y) {
+            return Math.Sqrt(Math.Pow(X - x, 2) + Math.Pow(Y - y, 2));
         }
 
         public virtual void Action(Entity source) {

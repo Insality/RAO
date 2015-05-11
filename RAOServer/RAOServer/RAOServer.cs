@@ -270,7 +270,7 @@ namespace RAOServer {
 
             // Game Requests:
             if (requests.ToList().Contains("map")){
-                data.Add("map", connection.Player.CurrentRoom.GetStringMap());
+                data.Add("map", connection.Player.CurrentRoom.GetMapInfo(connection.Player));
             }
 
             if (requests.ToList().Contains("players")){

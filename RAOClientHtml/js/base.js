@@ -134,7 +134,7 @@
 	function handleMessage(data){
 		json = JSON.parse(data);
 		jsonData = JSON.parse(json["data"].replace(/'/g, '"'));
-		// log(data);
+		log(data);
 		if (json["code"] != 200 || json["type"] == "status") {
 			log(data);
 		}
@@ -157,8 +157,7 @@
 			}
 
 			if (jsonData["map"]){
-				map = jsonData["map"].split('\n');
-				game["map"] = map;
+				game["map"] = jsonData["map"];
 			}
 
 			if (jsonData["players"]){
@@ -187,13 +186,16 @@
 		}
 		// Draw map
 		for (i in game["map"]){
-			map_row = game["map"][i];
-			for (j in map_row){
-				if (map_row[j] == "#"){
-					canvas.drawImage(img_wall, j*width - offsetX, i*width - offsetY);
+			tileList = game["map"][i];
+
+			for (pos in tileList) {
+				var x = tileList[pos][0];
+				var y = tileList[pos][1];
+				if (i == "#"){
+					canvas.drawImage(img_wall, x*width - offsetX, y*width - offsetY);
 				}
-				else if (map_row[j] == "."){
-					canvas.drawImage(img_floor, j*width - offsetX, i*width - offsetY);
+				else if (i == "."){
+					canvas.drawImage(img_floor, x*width - offsetX, y*width - offsetY);
 				}
 			}
 		}

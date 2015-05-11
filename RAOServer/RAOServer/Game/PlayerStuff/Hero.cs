@@ -7,10 +7,12 @@ namespace RAOServer.Game.PlayerStuff {
     internal class Hero:Entity {
         public Stat Endurance;
         public Stat Initiative;
+        public Stat SeeRadius;
         public int Level;
         public char Sym;
         public Hero(int x, int y, RAORoom room): base(x, y, "Player", "Player", 10, 2, room) {
             Endurance = new Stat(50);
+            SeeRadius = new Stat(6);
             Initiative = new Stat(new Random().Next(1, 20));
 
             Level = 1;
