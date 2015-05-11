@@ -78,6 +78,9 @@ namespace RAOServer.Game {
             X += x;
         }
 
+        public virtual void Update() {
+        }
+
         public void ActionBy(int x, int y) {
             var entities = Room.GetEntities(X + x, Y + y);
             // в случае, если на клетке и активируемый предмет и существо, выбираем только существ

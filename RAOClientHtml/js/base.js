@@ -134,7 +134,7 @@
 	function handleMessage(data){
 		json = JSON.parse(data);
 		jsonData = JSON.parse(json["data"].replace(/'/g, '"'));
-		log(data);
+		// log(data);
 		if (json["code"] != 200 || json["type"] == "status") {
 			log(data);
 		}

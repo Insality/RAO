@@ -4,7 +4,6 @@ using System.Linq;
 using System.Timers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RAOServer.Game.Entities.Enviroment;
 using RAOServer.Game.PlayerStuff;
 using RAOServer.Network;
 using RAOServer.Utils;
@@ -32,7 +31,7 @@ namespace RAOServer.Game {
             State = RoomStates.RoomWaiting;
             MaxPlayers = maxPlayers;
             _players = new List<Player>();
-            
+
 
             Entities = new List<Entity>();
 
@@ -56,6 +55,10 @@ namespace RAOServer.Game {
             GameTick();
         }
 
+
+        public Map GetMap() {
+            return _map;
+        }
         public JToken GetMapInfo(Player pl) {
             List<JObject> mapInfo;
             if (pl == null){
@@ -63,8 +66,9 @@ namespace RAOServer.Game {
             }
             else{
                 var h = pl.Hero;
-                mapInfo = _map.Tiles.Where(t=> h.DistanceTo(t.X, t.Y) <= h.SeeRadius.Current)
-                    .Select(tile => tile.GetInfo()).ToList();
+                var mapFOV = h.FOV;
+                mapInfo = mapFOV.Where(t => h.DistanceTo(t.X, t.Y) <= h.SeeRadius.Current)
+                    .Select(tile=>tile.GetInfo()).ToList();
             }
             return Map.CompressMapList(mapInfo);
         }
@@ -86,13 +90,14 @@ namespace RAOServer.Game {
             var players = _players.OrderBy(pl=>pl.Hero.Initiative.Current).ToList();
             foreach (var player in players){
                 player.Hero.Action();
+                player.Hero.Update();
             }
 
             // Send to all players game step info:
 
 
             foreach (var pl in _players){
-                var sm = new ServerMessage { Code = 200, Type = MsgDict.ServerInformation };
+                var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerInformation};
 
                 var data = new JObject();
                 data.Add("map", GetMapInfo(pl));
@@ -119,8 +124,8 @@ namespace RAOServer.Game {
             }
             else{
                 var h = pl.Hero;
-                entitiesInfo = Entities.Where(e => (Math.Sqrt(Math.Pow(h.X - e.X, 2) + Math.Pow(h.Y - e.Y, 2))) <= h.SeeRadius.Current)
-                    .Select(e => e.GetInfo()).ToList();
+                entitiesInfo = Entities.Where(e=> h.FOV.Contains(_map.GetTile(e.X, e.Y)))
+                    .Select(e=>e.GetInfo()).ToList();
             }
             return JToken.FromObject(entitiesInfo);
         }
