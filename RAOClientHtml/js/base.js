@@ -109,21 +109,17 @@
 	canvas.font = "14px Arial";
 	var width = 32;
 
-	var img_wall = new Image();
-	img_wall.src = "images/wall.png"
+	function loadImage(src){
+		img = new Image();
+		img.src = src;
+		return img;
+	}
 
-	var img_floor = new Image();
-	img_floor.src = "images/floor.png"
-
-	var img_player = new Image();
-	img_player.src = "images/player.png"
-
-	var img_pressure_plate = new Image();
-	img_pressure_plate.src = "images/pressure_plate_off.png"
-
-	var img_pressure_plate_on = new Image();
-	img_pressure_plate_on.src = "images/pressure_plate_on.png"
-
+	var img_wall = new loadImage("images/wall.png");
+	var img_floor = new loadImage("images/floor.png");
+	var img_player = new loadImage("images/player.png");
+	var img_pressure_plate = new loadImage("images/pressure_plate_off.png");
+	var img_pressure_plate_on = new loadImage("images/pressure_plate_on.png");
 
 	Images = {
 		"Player": img_player,

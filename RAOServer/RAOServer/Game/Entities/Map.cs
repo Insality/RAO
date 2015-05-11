@@ -1,19 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using RAOServer.Game.Entities.Enviroment;
 using RAOServer.Utils;
 
 namespace RAOServer.Game {
     internal class Map {
         public string Name;
         public List<List<Tile>> Tiles;
+        private RAORoom _room;
 
-        public Map() {
+        public Map(RAORoom room) {
             Name = "Unnamed dungeon";
+            _room = room;
         }
 
         public void LoadMapFromFile(string filename) {
             Tiles = new List<List<Tile>>();
+            var entities = _room.Entities;
 
             var s = File.ReadAllText(filename);
             var tileMap = new List<string>(s.Split('\n'));
@@ -33,6 +37,10 @@ namespace RAOServer.Game {
                         case '.':
                             tile = new Tile(tileMap[i][j]);
                             break;
+                        case '_':
+                            tile = new Tile(tileMap[i][j]);
+                            entities.Add(new PressurePlate(j, i, _room));
+                            break;
                         default:
                             tile = new Tile(tileMap[i][j]);
                             Log.Error("Error tile ASCII code in LoadMapFromFile()");
@@ -43,6 +51,7 @@ namespace RAOServer.Game {
                 Tiles.Add(tilesRow);
             }
         }
+
 
         public JObject GetInfo() {
             var info = new JObject {

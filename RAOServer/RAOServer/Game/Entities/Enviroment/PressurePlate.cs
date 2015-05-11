@@ -4,7 +4,7 @@ namespace RAOServer.Game.Entities.Enviroment {
     internal class PressurePlate: Entity {
         public bool IsPressed;
 
-        public PressurePlate(RAORoom room): base("PressurePlate", "PressurePlate", 10, 0, room) {
+        public PressurePlate(int x, int y, RAORoom room): base(x, y, "PressurePlate", "PressurePlate", 10, 0, room) {
             IsSolid = false;
             IsPressed = false;
         }

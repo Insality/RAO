@@ -4,6 +4,8 @@ using RAOServer.Utils;
 
 namespace RAOServer.Game {
     internal abstract class Entity {
+        public int Id;
+        private static int _idCounter;
         public Stat Damage;
         public Stat Health;
         // Можно ли проходить через сущность?
@@ -17,9 +19,11 @@ namespace RAOServer.Game {
         public int X;
         public int Y;
 
-        protected Entity(string image, string name, int health, int damage, RAORoom room) {
-            X = 0;
-            Y = 0;
+        protected Entity(int x, int y, string image, string name, int health, int damage, RAORoom room) {
+            Id = _idCounter;
+            _idCounter++;
+            X = x;
+            Y = y;
             Health = new Stat(health);
             Damage = new Stat(damage);
             Room = room;
@@ -55,6 +59,7 @@ namespace RAOServer.Game {
 
         public virtual JObject GetInfo() {
             var info = new JObject {
+                {"Id", Id},
                 {"Damage", Damage.Current},
                 {"Health", Health.Current},
                 {"HealthMax", Health.Max},

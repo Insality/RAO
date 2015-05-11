@@ -19,7 +19,7 @@ namespace RAOServer.Game.PlayerStuff {
             Name = name;
             CurrentRoom = null;
             State = PlayerStates.PlayerLobby;
-            Hero = new Hero(null);
+            Hero = new Hero(0, 0, null);
             _server = RAOServer.Instance;
             Connection = connection;
         }

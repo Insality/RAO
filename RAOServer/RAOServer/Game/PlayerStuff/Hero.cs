@@ -9,7 +9,7 @@ namespace RAOServer.Game.PlayerStuff {
         public Stat Initiative;
         public int Level;
         public char Sym;
-        public Hero(RAORoom room): base("Player", "Player", 10, 2, room) {
+        public Hero(int x, int y, RAORoom room): base(x, y, "Player", "Player", 10, 2, room) {
             Endurance = new Stat(50);
             Initiative = new Stat(new Random().Next(1, 20));
 
@@ -26,7 +26,7 @@ namespace RAOServer.Game.PlayerStuff {
         }
 
         public override void Action(Entity source) {
-            if (source.Name == "player"){
+            if (source.Name == "Player"){
                 Health -= source.Damage.Current;
             }
         }

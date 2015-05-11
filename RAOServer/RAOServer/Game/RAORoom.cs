@@ -16,7 +16,7 @@ namespace RAOServer.Game {
     /// </summary>
     internal class RAORoom {
         private static int _roomCounter;
-        private readonly Map _map = new Map();
+        private readonly Map _map;
         private readonly List<Player> _players;
         private readonly Timer timer;
         public List<Entity> Entities;
@@ -26,12 +26,13 @@ namespace RAOServer.Game {
         public int Turn;
 
         public RAORoom(int maxPlayers, int turnTime) {
+            _map = new Map(this);
             Id = _roomCounter++;
             Turn = 0;
             State = RoomStates.RoomWaiting;
             MaxPlayers = maxPlayers;
             _players = new List<Player>();
-            _map.LoadMapFromFile("testMap.txt");
+            
 
             Entities = new List<Entity>();
 
@@ -40,10 +41,7 @@ namespace RAOServer.Game {
             timer.Start();
             GC.KeepAlive(timer);
 
-
-            Entities.Add(new PressurePlate(this){X = 7, Y = 7});
-            Entities.Add(new PressurePlate(this){X = 9, Y = 9});
-            Entities.Add(new PressurePlate(this){X = 10, Y = 13});
+            _map.LoadMapFromFile("testMap.txt");
         }
 
         public List<List<Tile>> GetTiles() {
@@ -125,7 +123,7 @@ namespace RAOServer.Game {
             Log.Game(string.Format("Player {0} joined to room {1}", player.Name, Id));
             ChatToRoom(string.Format("Player {0} joined to room", player.Name), ":");
 
-            player.Hero = new Hero(this) {X = 3, Y = 5};
+            player.Hero = new Hero(3, 5, this);
             Entities.Add(player.Hero);
         }
 
