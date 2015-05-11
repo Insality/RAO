@@ -85,7 +85,7 @@ namespace RAOServer.Game {
             }
 
             foreach (var entity in entities){
-                if ((entity.IsSolid || (x == 0 && y == 0))){
+                if (entity != this && (entity.IsSolid || (x == 0 && y == 0))){
                     entity.Action(this);
                 }
                 else{
