@@ -11,6 +11,8 @@ namespace RAOServer {
         /** General settings */
         public static string GameName = Data["Server"]["GameName"];
         public static string GameRoute = Data["Server"]["GameRoute"];
+        public static string Python3Path = Data["Server"]["Python3Path"];
+        public static string NameGenScript = Data["Server"]["NameGenScript"];
 
 
         /** Logs && Statistics settings */

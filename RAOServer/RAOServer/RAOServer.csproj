@@ -87,6 +87,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Utils\Auth.cs" />
     <Compile Include="Utils\Log.cs" />
+    <Compile Include="Utils\NameGen.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

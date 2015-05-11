@@ -140,7 +140,7 @@ namespace RAOServer.Game {
             player.ConnectToRoom(Id);
 
             Log.Game(string.Format("Player {0} joined to room {1}", player.Name, Id));
-            ChatToRoom(string.Format("Player {0} joined to room", player.Name), ":");
+            ChatToRoom(string.Format("Player {0} joined to room. Map: {1}", player.Name, _map.Name), ":");
 
             player.Hero = new Hero(3, 5, this);
             Entities.Add(player.Hero);

@@ -4,6 +4,7 @@ using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json.Linq;
 using RAOServer.Game.Entities.Enviroment;
 using RAOServer.Game.PlayerStuff;
+using RAOServer.Utils;
 
 namespace RAOServer.Game {
     internal class Map {
@@ -14,7 +15,7 @@ namespace RAOServer.Game {
         private int mapHeight;
 
         public Map(RAORoom room) {
-            Name = "Unnamed dungeon";
+            Name = NameGen.GenLocation();
             _room = room;
         }
 
