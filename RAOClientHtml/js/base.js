@@ -109,22 +109,17 @@
 	canvas.font = "14px Arial";
 	var width = 32;
 
-	function loadImage(src){
+	var Images = {
+		"Wall": loadImage("Wall"), 
+		"Floor": loadImage("Floor")
+	};
+
+	function loadImage(name){
+		src = "images/" + name + ".png";
 		img = new Image();
 		img.src = src;
+		console.log("Loading image: " + src);
 		return img;
-	}
-
-	var img_wall = new loadImage("images/wall.png");
-	var img_floor = new loadImage("images/floor.png");
-	var img_player = new loadImage("images/player.png");
-	var img_pressure_plate = new loadImage("images/pressure_plate_off.png");
-	var img_pressure_plate_on = new loadImage("images/pressure_plate_on.png");
-
-	Images = {
-		"Player": img_player,
-		"PressurePlate": img_pressure_plate,
-		"PressurePlateOn": img_pressure_plate_on
 	}
 
 	game = {"map": "", "players": "", "player": "", "entities": ""};
@@ -179,11 +174,19 @@
 
 	function draw(){
 		canvas.clearRect(0, 0, canvas_el.width, canvas_el.height);
-
 		if (myPlayer["Hero"]){
 			var offsetX = (myPlayer["Hero"]["X"] * width) - canvas_el.width/2;
 			var offsetY = (myPlayer["Hero"]["Y"] * width) - canvas_el.height/2;
 		}
+
+		// In-Game loading images:
+		for (i in game["entities"]){
+			img = game["entities"][i]["Image"];
+			if (!Images.hasOwnProperty(img)){
+				Images[img] = loadImage(img);
+			}
+		}
+
 		// Draw map
 		for (i in game["map"]){
 			tileList = game["map"][i];
@@ -192,10 +195,10 @@
 				var x = tileList[pos][0];
 				var y = tileList[pos][1];
 				if (i == "#"){
-					canvas.drawImage(img_wall, x*width - offsetX, y*width - offsetY);
+					canvas.drawImage(Images["Wall"], x*width - offsetX, y*width - offsetY);
 				}
 				else if (i == "."){
-					canvas.drawImage(img_floor, x*width - offsetX, y*width - offsetY);
+					canvas.drawImage(Images["Floor"], x*width - offsetX, y*width - offsetY);
 				}
 			}
 		}
@@ -207,6 +210,7 @@
 
 			img = entity["Image"];
 			canvas.drawImage(Images[img], entity["X"] * width - offsetX, entity["Y"] * width - offsetY);
+
 		}
 
 		// HP bar:
