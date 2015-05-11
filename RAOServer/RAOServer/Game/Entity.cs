@@ -1,17 +1,17 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Linq;
+using Newtonsoft.Json.Linq;
 using RAOServer.Game.Mechanics;
-using RAOServer.Utils;
 
 namespace RAOServer.Game {
     internal abstract class Entity {
-        public int Id;
         private static int _idCounter;
         public Stat Damage;
         public Stat Health;
+        public int Id;
         // Можно ли проходить через сущность?
-        public bool IsSolid;
 
         public string Image;
+        public bool IsSolid;
 
         protected string LastAction = "";
         public string Name;
@@ -37,7 +37,7 @@ namespace RAOServer.Game {
         }
 
         public virtual void Action() {
-            switch (LastAction) {
+            switch (LastAction){
                 case "control_up":
                     ActionBy(0, -1);
                     break;
@@ -78,13 +78,23 @@ namespace RAOServer.Game {
         }
 
         public void ActionBy(int x, int y) {
-            var entity = Room.GetEntity(X + x, Y + y);
-            if (entity != null && (entity.IsSolid || (x==0 && y==0))){
-                entity.Action(this);
+            var entities = Room.GetEntities(X + x, Y + y);
+            // в случае, если на клетке и активируемый предмет и существо, выбираем только существ
+            if (entities.Any(e=>e.IsSolid && e != this)){
+                entities = entities.Where(e=>e.IsSolid && e != this).ToList();
             }
-            else{
+
+            foreach (var entity in entities){
+                if ((entity.IsSolid || (x == 0 && y == 0))){
+                    entity.Action(this);
+                }
+                else{
+                    MoveBy(x, y);
+                }
+            }
+
+            if (!entities.Any())
                 MoveBy(x, y);
-            }
         }
 
         public virtual void Action(Entity source) {

@@ -48,8 +48,8 @@ namespace RAOServer.Game {
             return _map.Tiles;
         }
 
-        public Entity GetEntity(int x, int y) {
-            return Entities.Find(ent=>ent.X == x && ent.Y == y);
+        public List<Entity> GetEntities(int x, int y) {
+            return Entities.Where(ent=>ent.X == x && ent.Y == y).ToList();
         }
 
         public void OnTimedEvent(object source, ElapsedEventArgs e) {
