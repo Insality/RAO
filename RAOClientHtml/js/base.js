@@ -1,9 +1,53 @@
 ;(function(){
 
+	// UTILS FUNCTIONS
+	// ===============
+
+	function arrayUnique(array) {
+		var a = this.concat();
+		for(var i=0; i<a.length; ++i) {
+			for(var j=i+1; j<a.length; ++j) {
+				if(a[i] === a[j])
+					a.splice(j--, 1);
+			}
+		}
+		return a;
+	};
+
 	function log(text){
 		new_text = text + "\n" + $("#logger").text();
 		$("#logger").text(new_text);
 	}
+
+	function extendJson(outputJson, json){
+		for (var key in json){
+			outputJson[key] = json[key];
+		}
+		return outputJson;
+	}
+
+	function extendMap(outputMap, map){
+		for (var key in map){
+			if (!outputMap.hasOwnProperty(key)){
+				outputMap[key] = [];
+			}
+			// outputMap[key] = _.union(outputMap[key], map[key])
+			for (var i in map[key]){
+				var exist = false;
+				for (var j in outputMap[key]){
+					if (map[key][i][0] === outputMap[key][j][0] && map[key][i][1] === outputMap[key][j][1]){
+						exist = true;
+						break;
+					}
+				}
+				if (!exist){
+					outputMap[key].push(map[key][i])
+				}
+			}
+		}
+		return outputMap;
+	};
+
 
 	// REQUESTS BUILDER
 	// ================
@@ -122,7 +166,7 @@
 		return img;
 	}
 
-	game = {"map": "", "players": "", "player": "", "entities": ""};
+	game = {"map": {}, "players": "", "player": "", "entities": ""};
 	myPlayer = {}
 
 	chat = []
@@ -152,7 +196,8 @@
 			}
 
 			if (jsonData["map"]){
-				game["map"] = jsonData["map"];
+				game["map"] = extendMap(game["map"], jsonData["map"])
+				game["activeMap"] = jsonData["map"];
 			}
 
 			if (jsonData["players"]){
@@ -172,7 +217,9 @@
 		}
 	}
 
+	// var d = new Date();
 	function draw(){
+		var curTime = new Date().getTime();
 		canvas.clearRect(0, 0, canvas_el.width, canvas_el.height);
 		if (myPlayer["Hero"]){
 			var offsetX = (myPlayer["Hero"]["X"] * width) - canvas_el.width/2;
@@ -186,10 +233,35 @@
 				Images[img] = loadImage(img);
 			}
 		}
-
-		// Draw map
+		// Draw all map
 		for (i in game["map"]){
 			tileList = game["map"][i];
+
+			for (pos in tileList) {
+				var x = tileList[pos][0];
+				var y = tileList[pos][1];
+				var drawX = x*width - offsetX;
+				var drawY = y*width - offsetY;
+
+				// if this tile on screen:
+				if (drawX > -width && drawX < canvas_el.width && drawY >= -width && drawY < canvas_el.height){
+					if (i == "#"){
+						canvas.drawImage(Images["Wall"], drawX, drawY);
+					}
+					else if (i == "."){
+						canvas.drawImage(Images["Floor"], drawX, drawY);
+					}
+					canvas.globalAlpha = 0.2;
+					canvas.fillStyle = "#000000";
+					canvas.fillRect(x*width - offsetX, y*width - offsetY, width, width);
+					canvas.globalAlpha = 1;
+				}
+			}
+		}
+
+		// Draw active map
+		for (i in game["activeMap"]){
+			tileList = game["activeMap"][i];
 
 			for (pos in tileList) {
 				var x = tileList[pos][0];
@@ -228,6 +300,7 @@
 			canvas.fillStyle = "#FFFFFF";
 			canvas.fillText(game["players"][i]["Name"], c_width-bar_width, (bar_height+4)*i + bar_height/2);
 		}
+		console.log(new Date().getTime() - curTime)
 	}
 
 	// UPDATE FUNCTIONS
