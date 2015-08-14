@@ -1,6 +1,7 @@
 ﻿namespace RAOServer.Game.Mechanics {
     internal class Stat {
         private int _current;
+        private int _max;
 
         public int Current {
             get { return _current; }
@@ -14,7 +15,16 @@
                 else _current = value;
             }
         }
-        public int Max;
+
+        public int Max {
+            get { return _max; }
+            set {
+                if (value < Current){
+                    Current = value;
+                }
+                _max = value;
+            }
+        }
 
         public Stat(int max) {
             Max = max;

@@ -114,7 +114,8 @@
 
 	// CONNECTIONS SETTINGS
 	// ====================
-	URL = "ws://localhost:4080/rao"
+	URL = "ws://127.0.0.1:4080/rao"
+	// URL = "ws://45.55.134.136:4080/rao"
 	ws = new WebSocket(URL);
 	ws.onopen = function(){ 
 		log("Connection opened to "+ URL);
@@ -173,7 +174,7 @@
 	function handleMessage(data){
 		json = JSON.parse(data);
 		jsonData = JSON.parse(json["data"].replace(/'/g, '"'));
-		// log(data);
+		log(data);
 		if (json["code"] != 200 || json["type"] == "status") {
 			log(data);
 		}
@@ -213,6 +214,7 @@
 
 			if (jsonData["entities"]){
 				game["entities"] = jsonData["entities"];
+				console.log(game["entities"])
 			}
 		}
 	}
@@ -286,21 +288,25 @@
 		}
 
 		// HP bar:
-		for (i in game["players"]){
-			hero = game["players"][i]["Hero"];
-			// render simple GUI
-			bar_width = 100;
-			bar_height = 20;
-			c_width = canvas_el.width
+		for (i in game["entities"]){
+			entity = game["entities"][i];
+			if (entity["Type"] == "Enemy" || entity["Type"] == "Player"){
+				// render simple GUI
+				bar_width = 32;
+				bar_height = 8;
+				c_width = canvas_el.width
+				var ent_x = entity["X"] * width - offsetX
+				var ent_y = entity["Y"] * width - offsetY;
 
-			canvas.fillStyle = "#000000";
-			canvas.fillRect(c_width-bar_width, (bar_height+4)*i, bar_width, bar_height);
-			canvas.fillStyle = "#FF0000";
-			canvas.fillRect(c_width-bar_width, ((bar_height+4)* i), bar_width * (hero["Health"]/hero["HealthMax"]), bar_height);
-			canvas.fillStyle = "#FFFFFF";
-			canvas.fillText(game["players"][i]["Name"], c_width-bar_width, (bar_height+4)*i + bar_height/2);
+				canvas.fillStyle = "#000000";
+				canvas.fillRect(ent_x, ent_y+32, bar_width, bar_height);
+				canvas.fillStyle = "#FF0000";
+				canvas.fillRect(ent_x, ent_y+32, bar_width * (entity["Health"]/entity["HealthMax"]), bar_height);
+				// canvas.fillStyle = "#000000";
+				// canvas.fillText(entity["Name"], ent_x, ent_y+38);
+			}
 		}
-		console.log(new Date().getTime() - curTime)
+		// console.log(new Date().getTime() - curTime)
 	}
 
 	// UPDATE FUNCTIONS

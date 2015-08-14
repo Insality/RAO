@@ -4,6 +4,7 @@ using System.Linq;
 using System.Timers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RAOServer.Game.Entities.Enemies;
 using RAOServer.Game.PlayerStuff;
 using RAOServer.Network;
 using RAOServer.Utils;
@@ -34,6 +35,7 @@ namespace RAOServer.Game {
 
 
             Entities = new List<Entity>();
+            Entities.Add(new Enemy(8, 8, this));
 
             timer = new Timer(turnTime);
             timer.Elapsed += OnTimedEvent;
@@ -87,14 +89,13 @@ namespace RAOServer.Game {
 
         public void GameTick() {
             // Do all player actions:
-            var players = _players.OrderBy(pl=>pl.Hero.Initiative.Current).ToList();
-            foreach (var player in players){
-                player.Hero.Action();
-                player.Hero.Update();
+            var entities = Entities.OrderBy(e=>e.Initiative.Current).Reverse().ToList();
+            foreach (var e in entities) {
+                e.Action();
+                e.Update();
             }
 
             // Send to all players game step info:
-
 
             foreach (var pl in _players){
                 var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerInformation};
@@ -147,12 +148,17 @@ namespace RAOServer.Game {
         }
 
         internal void DisconnectPlayer(Player player) {
-            Entities.Remove(player.Hero);
+            KillEntity(player.Hero);
             _players.Remove(player);
             player.ConnectToLobby();
 
             Log.Game(string.Format("Player {0} leave room {1}", player.Name, Id));
             ChatToRoom(string.Format("Player {0} leave room", player.Name), ":");
+        }
+
+        internal void KillEntity(Entity ent) {
+            // TODO: дроп или еще что тут
+            Entities.Remove(ent);
         }
 
         internal void ChatToRoom(string msg, string sender) {

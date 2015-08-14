@@ -4,10 +4,17 @@ using Newtonsoft.Json.Linq;
 using RAOServer.Game.Mechanics;
 
 namespace RAOServer.Game {
+
+    public enum EntityType {
+        Player,
+        Enemy, 
+        Item
+    }
     internal abstract class Entity {
         private static int _idCounter;
         public Stat Damage;
         public Stat Health;
+        public Stat Initiative;
         public int Id;
         // Можно ли проходить через сущность?
 
@@ -17,17 +24,20 @@ namespace RAOServer.Game {
         protected string LastAction = "";
         public string Name;
         protected RAORoom Room;
+        public EntityType EntityType; 
         public int X;
         public int Y;
 
-        protected Entity(int x, int y, string image, string name, int health, int damage, RAORoom room) {
+        protected Entity(int x, int y, string image, string name, int health, int damage, EntityType type, RAORoom room) {
             Id = _idCounter;
             _idCounter++;
             X = x;
             Y = y;
             Health = new Stat(health);
             Damage = new Stat(damage);
+            Initiative = new Stat(new Random().Next(1, 20));
             Room = room;
+            EntityType = type;
             Image = image;
             Name = name;
             IsSolid = true;
@@ -64,8 +74,10 @@ namespace RAOServer.Game {
                 {"Damage", Damage.Current},
                 {"Health", Health.Current},
                 {"HealthMax", Health.Max},
+                {"Initiative", Initiative.Current},
                 {"Name", Name},
                 {"Image", Image},
+                {"Type", EntityType.ToString()},
                 {"X", X},
                 {"Y", Y}
             };
@@ -79,6 +91,9 @@ namespace RAOServer.Game {
         }
 
         public virtual void Update() {
+            if (Health.Current <= 0){
+                Room.KillEntity(this);
+            }
         }
 
         public void ActionBy(int x, int y) {
