@@ -10,15 +10,15 @@ namespace RAOServer.Game {
         Enemy, 
         Item
     }
+
     internal abstract class Entity {
         private static int _idCounter;
         public Stat Damage;
         public Stat Health;
         public Stat Initiative;
         public int Id;
-        // Можно ли проходить через сущность?
-
         public string Image;
+        // Можно ли проходить через сущность?
         public bool IsSolid;
 
         protected string LastAction = "";

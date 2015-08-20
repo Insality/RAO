@@ -5,6 +5,7 @@ using System.Timers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RAOServer.Game.Entities.Enemies;
+using RAOServer.Game.Entities.Enviroment;
 using RAOServer.Game.PlayerStuff;
 using RAOServer.Network;
 using RAOServer.Utils;
@@ -18,7 +19,7 @@ namespace RAOServer.Game {
         private static int _roomCounter;
         private readonly Map _map;
         private readonly List<Player> _players;
-        private readonly Timer timer;
+        private readonly Timer _timer;
         public List<Entity> Entities;
         public int Id;
         public int MaxPlayers;
@@ -33,16 +34,16 @@ namespace RAOServer.Game {
             MaxPlayers = maxPlayers;
             _players = new List<Player>();
 
-
             Entities = new List<Entity>();
             Entities.Add(new Enemy(8, 8, this));
 
-            timer = new Timer(turnTime);
-            timer.Elapsed += OnTimedEvent;
-            timer.Start();
-            GC.KeepAlive(timer);
+            _timer = new Timer(turnTime);
+            _timer.Elapsed += OnTimedEvent;
+            _timer.Start();
+            GC.KeepAlive(_timer);
 
-            _map.LoadMapFromFile("testMap.txt");
+//            _map.LoadMapFromFile("testMap.txt");
+            _map.LoadMapFromFile("SmallArena.txt");
         }
 
         public List<Tile> GetTiles() {
@@ -82,7 +83,7 @@ namespace RAOServer.Game {
                 {"MaxPlayers", MaxPlayers},
                 {"State", State.ToString()},
                 {"Map", _map.GetInfo()},
-                {"TurnTime", timer.Interval}
+                {"TurnTime", _timer.Interval}
             };
             return info;
         }
@@ -110,6 +111,7 @@ namespace RAOServer.Game {
                 pl.Connection.SendData(sm.Serialize());
             }
 
+           
             Turn++;
         }
 

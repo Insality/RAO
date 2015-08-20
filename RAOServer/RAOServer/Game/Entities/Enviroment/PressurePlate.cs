@@ -9,12 +9,6 @@ namespace RAOServer.Game.Entities.Enviroment {
             IsPressed = false;
         }
 
-//        public override JObject GetInfo() {
-//            var info = base.GetInfo();
-//            info.Add("IsPressed", IsPressed);
-//            return info;
-//        }
-
         public override void Action(Entity source) {
             if (source.Name == "Player"){
                 IsPressed = true;

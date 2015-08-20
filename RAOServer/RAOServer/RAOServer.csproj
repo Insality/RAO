@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Game\Entities\Enemies\Enemy.cs" />
+    <Compile Include="Game\Entities\Enviroment\Door.cs" />
     <Compile Include="Game\Entities\Enviroment\PressurePlate.cs" />
     <Compile Include="Game\Entity.cs" />
     <Compile Include="Game\Entities\Map.cs" />
@@ -121,6 +122,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="SmallArena.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="testMap.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
