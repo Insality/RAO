@@ -49,7 +49,7 @@ namespace RAOServer {
             _serverConsole = new Thread(ServerConsoleHandler);
             _serverConsole.Start();
 
-            CreateNewRoom(4, 500);
+            CreateNewRoom(4, 250);
 
             _serverConsole.Join();
             _serverConnections.Join();

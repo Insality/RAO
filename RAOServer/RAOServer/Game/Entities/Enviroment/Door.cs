@@ -20,6 +20,7 @@ namespace RAOServer.Game.Entities.Enviroment {
                         Image = "DoorOpened";
                     }
                 }
+                
             }
         }
     }

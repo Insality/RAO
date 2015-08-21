@@ -21,7 +21,7 @@ namespace RAOServer.Game {
         // Можно ли проходить через сущность?
         public bool IsSolid;
 
-        protected string LastAction = "";
+        public string LastAction = "";
         public string Name;
         protected RAORoom Room;
         public EntityType EntityType; 
@@ -47,6 +47,9 @@ namespace RAOServer.Game {
             LastAction = action;
         }
 
+        /// <summary>
+        /// Выполняет действие, которое стоит в очереди на следующий ход
+        /// </summary>
         public virtual void Action() {
             switch (LastAction){
                 case "control_up":
@@ -98,16 +101,18 @@ namespace RAOServer.Game {
 
         public void ActionBy(int x, int y) {
             var entities = Room.GetEntities(X + x, Y + y);
+            entities.Remove(this);
             // в случае, если на клетке и активируемый предмет и существо, выбираем только существ
-            if (entities.Any(e=>e.IsSolid && e != this)){
-                entities = entities.Where(e=>e.IsSolid && e != this).ToList();
+            if (entities.Any(e=>e.IsSolid)){
+                entities = entities.Where(e=>e.IsSolid).ToList();
             }
 
             foreach (var entity in entities){
-                if (entity != this && (entity.IsSolid || (x == 0 && y == 0))){
+                if (entity.IsSolid || (x == 0 && y == 0)){
                     entity.Action(this);
                 }
                 else{
+                    entity.Action(this);
                     MoveBy(x, y);
                 }
             }

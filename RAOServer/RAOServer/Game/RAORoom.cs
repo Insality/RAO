@@ -89,7 +89,7 @@ namespace RAOServer.Game {
         }
 
         public void GameTick() {
-            // Do all player actions:
+            // Do all enteties actions:
             var entities = Entities.OrderBy(e=>e.Initiative.Current).Reverse().ToList();
             foreach (var e in entities) {
                 e.Action();
@@ -97,7 +97,6 @@ namespace RAOServer.Game {
             }
 
             // Send to all players game step info:
-
             foreach (var pl in _players){
                 var sm = new ServerMessage {Code = 200, Type = MsgDict.ServerInformation};
 
@@ -145,7 +144,7 @@ namespace RAOServer.Game {
             Log.Game(string.Format("Player {0} joined to room {1}", player.Name, Id));
             ChatToRoom(string.Format("Player {0} joined to room. Map: {1}", player.Name, _map.Name), ":");
 
-            player.Hero = new Hero(3, 5, this);
+            player.Hero = new Hero(4, 10, this);
             Entities.Add(player.Hero);
         }
 

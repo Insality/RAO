@@ -41,6 +41,9 @@ namespace RAOServer.Game {
                         case 'D':
                             entities.Add(new Door(j, i, _room));
                             break;
+                        case 'T':
+                            entities.Add(new Trap(j, i, _room));
+                            break;
                     }
                     Tiles.Add(new Tile(j, i, tileMap[i][j]));
                 }
