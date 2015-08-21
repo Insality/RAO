@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Game\Entities\Enemies\Enemy.cs" />
+    <Compile Include="Game\Entities\Enviroment\Spawn.cs" />
     <Compile Include="Game\Entities\Enviroment\Trap.cs" />
     <Compile Include="Game\Entities\Enviroment\Door.cs" />
     <Compile Include="Game\Entities\Enviroment\PressurePlate.cs" />

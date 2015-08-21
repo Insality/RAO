@@ -48,6 +48,9 @@ namespace RAOServer.Game {
                         case 'E':
                             entities.Add(new Enemy(j, i, _room));
                             break;
+                        case 'S':
+                            entities.Add(new Spawn(j, i, _room));
+                            break;
                     }
                     Tiles.Add(new Tile(j, i, tileMap[i][j]));
                 }
