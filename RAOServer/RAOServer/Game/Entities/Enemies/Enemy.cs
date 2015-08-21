@@ -6,7 +6,7 @@ namespace RAOServer.Game.Entities.Enemies {
         private readonly List<String> _patternList;
         private int _curStep;
 
-        public Enemy(int x, int y, RAORoom room): base(x, y, "Enemy", "Enemy", 4, 2, EntityType.Enemy, room) {
+        public Enemy(int x, int y, RAORoom room): base(x, y, "Enemy", "Enemy", 9, 2, EntityType.Enemy, room) {
             _curStep = 0;
             _patternList = new List<string> { "control_up", "", "control_right", "", "control_down", "", "control_left", ""};
             Initiative.Max = 1;

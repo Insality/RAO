@@ -31,7 +31,7 @@
 			if (!outputMap.hasOwnProperty(key)){
 				outputMap[key] = [];
 			}
-			// outputMap[key] = _.union(outputMap[key], map[key])
+
 			for (var i in map[key]){
 				var exist = false;
 				for (var j in outputMap[key]){
@@ -214,7 +214,6 @@
 
 			if (jsonData["entities"]){
 				game["entities"] = jsonData["entities"];
-				console.log(game["entities"])
 			}
 		}
 	}
@@ -277,7 +276,6 @@
 			}
 		}
 
-		// console.log(game);
 		// Draw entities
 		for (i in game["entities"]){
 			entity = game["entities"][i];
@@ -306,7 +304,6 @@
 				// canvas.fillText(entity["Name"], ent_x, ent_y+38);
 			}
 		}
-		// console.log(new Date().getTime() - curTime)
 	}
 
 	// UPDATE FUNCTIONS

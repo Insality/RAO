@@ -13,6 +13,8 @@ namespace RAOServer.Game {
                 IsSolid = true;
             }
             else{
+                // В остальных случаях - тайл пола
+                symbol = '.';
                 IsSolid = false;
             }
             Symbol = symbol;

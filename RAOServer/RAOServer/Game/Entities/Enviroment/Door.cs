@@ -11,7 +11,7 @@ namespace RAOServer.Game.Entities.Enviroment {
         }
 
         public override void Action(Entity source) {
-            if (source.Name == "Player"){
+            if (source.EntityType == EntityType.Player) {
                 if (IsClosed){
                     var plates = Room.Entities.Where(ent=>ent is PressurePlate && !(ent as PressurePlate).IsPressed);
                     if (!plates.Any()){

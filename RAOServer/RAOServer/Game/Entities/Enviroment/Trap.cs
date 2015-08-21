@@ -10,12 +10,12 @@ namespace RAOServer.Game.Entities.Enviroment {
         public Trap(int x, int y, RAORoom room): base(x, y, "TrapDeactive", "Tra", 10, 4, EntityType.Item, room) {
             IsSolid = false;
             IsActive = false;
-            _trapCooldown = 8;
+            _trapCooldown = 12;
             _curTrapCooldown = 0;
         }
 
         public override void Action(Entity source) {
-            if (source.Name == "Player"){
+            if (source.EntityType == EntityType.Enemy || source.EntityType == EntityType.Player){
                 if (!IsActive){
                     IsActive = true;
                     source.Health -= Damage.Current;

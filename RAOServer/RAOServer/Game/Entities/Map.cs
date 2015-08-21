@@ -2,6 +2,7 @@
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json.Linq;
+using RAOServer.Game.Entities.Enemies;
 using RAOServer.Game.Entities.Enviroment;
 using RAOServer.Game.PlayerStuff;
 using RAOServer.Utils;
@@ -43,6 +44,9 @@ namespace RAOServer.Game {
                             break;
                         case 'T':
                             entities.Add(new Trap(j, i, _room));
+                            break;
+                        case 'E':
+                            entities.Add(new Enemy(j, i, _room));
                             break;
                     }
                     Tiles.Add(new Tile(j, i, tileMap[i][j]));

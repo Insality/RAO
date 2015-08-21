@@ -35,7 +35,6 @@ namespace RAOServer.Game {
             _players = new List<Player>();
 
             Entities = new List<Entity>();
-            Entities.Add(new Enemy(8, 8, this));
 
             _timer = new Timer(turnTime);
             _timer.Elapsed += OnTimedEvent;

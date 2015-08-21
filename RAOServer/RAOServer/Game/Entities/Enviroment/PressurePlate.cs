@@ -10,7 +10,7 @@ namespace RAOServer.Game.Entities.Enviroment {
         }
 
         public override void Action(Entity source) {
-            if (source.Name == "Player"){
+            if (source.EntityType == EntityType.Player) {
                 IsPressed = true;
                 Image = "PressurePlateOn";
             }
